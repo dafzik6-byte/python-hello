@@ -1,32 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bitcoin Simple Chart</title>
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <title>Bitcoin Candlestick Fix</title>
+    <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        body { margin: 0; background-color: #131722; font-family: sans-serif; }
+        #chart-container { width: 100%; height: 500px; }
+        h2 { color: white; padding: 20px; }
+    </style>
 </head>
 <body>
-    <h2 style="font-family: sans-serif;">Bitcoin (BTC/USD) - Latihan Chart</h2>
+    <h2>BTC/USD Candlestick (Fixed)</h2>
     <div id="chart-container"></div>
 
     <script>
-        const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
-            width: 800,
-            height: 400,
-            layout: { backgroundColor: '#ffffff', textColor: '#333' },
-            grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
-        });
+// 1. Tambahkan opsi untuk memperlebar batang (barSpacing)
+const chartOptions = { 
+    layout: { backgroundColor: '#131722', textColor: '#d1d4dc' },
+    width: window.innerWidth,
+    height: 500,
+    timeScale: {
+        barSpacing: 60,      // Semakin besar angka ini, semakin lebar batangnya
+        rightOffset: 10,     // Memberi sedikit ruang di sisi kanan
+    },
+};
 
-        const lineSeries = chart.addLineSeries({ color: '#2962FF', lineWidth: 2 });
+const chart = LightweightCharts.createChart(document.getElementById('chart-container'), chartOptions);
 
-        // Data Contoh (Waktu & Harga)
-        lineSeries.setData([
-            { time: '2026-02-01', value: 95000 },
-            { time: '2026-02-02', value: 97000 },
-            { time: '2026-02-03', value: 96000 },
-            { time: '2026-02-04', value: 98500 },
-            { time: '2026-02-05', value: 101000 },
-            { time: '2026-02-06', value: 103000 },
-        ]);
+const candleSeries = chart.addCandlestickSeries({
+    upColor: '#26a69a', downColor: '#ef5350', 
+    borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350'
+});
+
+const data = [
+    { time: '2026-02-01', open: 95000, high: 97000, low: 94000, close: 96500 },
+    { time: '2026-02-02', open: 96500, high: 99000, low: 96000, close: 98000 },
+    { time: '2026-02-03', open: 98000, high: 101000, low: 97500, close: 100500 },
+    { time: '2026-02-04', open: 100500, high: 100800, low: 92000, close: 94000 },
+    { time: '2026-02-05', open: 94000, high: 98000, low: 93500, close: 97500 },
+    { time: '2026-02-06', open: 97500, high: 105000, low: 97000, close: 104500 }
+];
+
+candleSeries.setData(data);
+
+// 2. Ini yang memaksa semua data terlihat memenuhi area yang tersedia
+chart.timeScale().fitContent();
+
+// Simulasi pergerakan harga pada candle terakhir
+setInterval(() => {
+    const lastData = data[data.length - 1];
+    
+    // Memberikan variasi harga acak sekitar +/- 100
+    const change = (Math.random() - 0.5) * 200;
+    const newClose = lastData.close + change;
+    
+    // Update data candle terakhir
+    candleSeries.update({
+        time: lastData.time,
+        open: lastData.open,
+        high: Math.max(lastData.high, newClose),
+        low: Math.min(lastData.low, newClose),
+        close: newClose
+    });
+}, 1000);
     </script>
 </body>
 </html>
