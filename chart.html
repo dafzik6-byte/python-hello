@@ -1,61 +1,176 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pro Trading Terminal - BTC</title>
+    <title>Pro Terminal: Full Features</title>
     <style>
-        /* Paksa body dan html ambil 100% tinggi layar */
-        html, body { 
-            margin: 0; 
-            padding: 0; 
-            height: 100%; 
-            width: 100%; 
-            background-color: #131722; 
-            overflow: hidden; /* Hilangkan scrollbar luar */
+        :root { --bg: #0b0e11; --line: #2b2f36; --up: #02c076; --down: #f84960; --yellow: #fcd535; }
+        body { margin: 0; display: flex; height: 100vh; background: var(--bg); color: #eaecef; font-family: 'Inter', sans-serif; overflow: hidden; }
+        
+        /* Area Chart (Left) */
+        #chart-zone { flex: 1; border-right: 1px solid var(--line); position: relative; }
+        
+        /* Sidebar (Right) */
+        #aggr-sidebar { width: 400px; display: flex; flex-direction: column; background: var(--bg); }
+        .panel-control { padding: 15px; background: #181a20; border-bottom: 1px solid var(--line); position: relative; }
+        
+        input { width: 100%; background: #2b2f36; border: 1px solid #474d57; color: white; padding: 12px; border-radius: 4px; box-sizing: border-box; outline: none; font-size: 14px; }
+        input:focus { border-color: var(--yellow); }
+        
+        #search-results { 
+            position: absolute; top: 75px; left: 15px; right: 15px; 
+            background: #2b3139; border: 1px solid var(--line); border-radius: 4px; 
+            max-height: 300px; overflow-y: auto; z-index: 1000; display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
+        .result-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #363c45; font-size: 13px; display: flex; justify-content: space-between; }
+        .result-item:hover { background: #474d57; }
 
-        /* Container widget harus memenuhi sisa layar */
-        .tradingview-widget-container { 
-            height: 100%; 
-            width: 100%; 
-        }
-
-        #tradingview_pro {
-            height: 100%;
-            width: 100%;
-        }
+        #main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        #trade-feed { flex: 1; overflow-y: hidden; }
+        #dex-frame { display: none; flex: 1; border: none; width: 100%; }
+        
+        .trade-entry { display: flex; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid #1e2329; font-family: 'Roboto Mono', monospace; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="tradingview-widget-container">
-        <div id="tradingview_pro"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script type="text/javascript">
-        new TradingView.widget(
-        {
-            "autosize": true, // Ini akan mengikuti ukuran container-nya
-            "symbol": "BINANCE:BTCUSDT",
-            "interval": "1",
-            "timezone": "Asia/Jakarta",
-            "theme": "dark",
-            "style": "1",
-            "locale": "id",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "withdateranges": true,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "details": true,
-            "hotlist": true,
-            "calendar": true,
-            "show_popup_button": true,
-            "popup_width": "1000",
-            "popup_height": "650",
-            "container_id": "tradingview_pro"
-        }
-        );
-        </script>
+    <div id="chart-zone">
+        <div id="tv_engine" style="height: 100%;"></div>
     </div>
 
+    <div id="aggr-sidebar">
+        <div class="panel-control">
+            <input type="text" id="coin-search" placeholder="Cari koin (BTC, PEPE, MYX)..." autocomplete="off">
+            <div id="search-results"></div>
+        </div>
+
+        <div id="main-content">
+            <div id="binance-ui" style="display: flex; flex-direction: column; flex: 1;">
+                <div style="font-size: 10px; color: #848e9c; padding: 10px 15px; display: flex; justify-content: space-between; background: #181a20; font-weight: bold;">
+                    <span>TIME</span>
+                    <span id="target-title" style="color: var(--yellow)">BTCUSDT</span>
+                    <span>VALUE (USD)</span>
+                </div>
+                <div id="trade-feed"></div>
+            </div>
+            <iframe id="dex-frame"></iframe>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        let allSymbols = [];
+        let tradeWS;
+        let tvWidget;
+
+        // FUNGSI UTAMA: Load Chart dengan SEMUA Fitur
+        function loadChart(symbol) {
+            tvWidget = new TradingView.widget({
+                "autosize": true,
+                "symbol": "BINANCE:" + symbol,
+                "interval": "1",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "withdateranges": true,
+                "hide_side_toolbar": false, // Toolbar Gambar (Kiri)
+                "allow_symbol_change": true,
+                "container_id": "tv_engine",
+                // MEMAKSA SEMUA TOMBOL MUNCUL:
+                "header_widget_buttons_mode": "adaptive",
+                "enabled_features": [
+                    "use_localstorage_for_settings_save",
+                    "header_widget", // Toolbar Atas
+                    "header_indicators", // Tombol Indikator
+                    "header_settings", // Tombol Gear/Pengaturan
+                    "header_fullscreen_button", // Tombol Fullscreen
+                    "header_screenshot", // Tombol Kamera
+                    "header_symbol_search", // Pencarian koin di dalam chart
+                    "header_compare"
+                ]
+            });
+        }
+
+        async function getBinanceList() {
+            try {
+                const r = await fetch('https://api.binance.com/api/v3/exchangeInfo');
+                const data = await r.json();
+                allSymbols = data.symbols.filter(s => s.status === 'TRADING' && s.quoteAsset === 'USDT').map(s => s.symbol);
+            } catch (e) { console.error("Gagal load koin"); }
+        }
+
+        const input = document.getElementById('coin-search');
+        const results = document.getElementById('search-results');
+
+        input.addEventListener('input', (e) => {
+            const val = e.target.value.toUpperCase();
+            results.innerHTML = '';
+            if (val.length > 0) {
+                results.style.display = 'block';
+                const matches = allSymbols.filter(s => s.includes(val)).slice(0, 10);
+                matches.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'result-item';
+                    div.innerHTML = `<span>${m}</span> <small style="color:var(--yellow)">BINANCE</small>`;
+                    div.onclick = () => {
+                        activateBinance(m);
+                        loadChart(m); // Reload chart agar sinkron
+                    };
+                    results.appendChild(div);
+                });
+                const dexDiv = document.createElement('div');
+                dexDiv.className = 'result-item';
+                dexDiv.innerHTML = `<span>Cari "${val}"</span> <small style="color:#58a6ff">DEX / NEW</small>`;
+                dexDiv.onclick = () => activateDEX(val);
+                results.appendChild(dexDiv);
+            } else { results.style.display = 'none'; }
+        });
+
+        function activateBinance(symbol) {
+            document.getElementById('binance-ui').style.display = 'flex';
+            document.getElementById('dex-frame').style.display = 'none';
+            results.style.display = 'none';
+            input.value = '';
+            startStream(symbol);
+        }
+
+        function activateDEX(query) {
+            document.getElementById('binance-ui').style.display = 'none';
+            const frame = document.getElementById('dex-frame');
+            frame.style.display = 'block';
+            frame.src = `https://dexscreener.com/search?q=${query}&embed=1&theme=dark&trades=1`;
+            results.style.display = 'none';
+            input.value = '';
+        }
+
+        function startStream(symbol) {
+            if (tradeWS) tradeWS.close();
+            document.getElementById('target-title').innerText = symbol;
+            document.getElementById('trade-feed').innerHTML = '';
+            tradeWS = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@aggTrade`);
+            tradeWS.onmessage = (e) => {
+                const d = JSON.parse(e.data);
+                const usdVal = parseFloat(d.p) * parseFloat(d.q);
+                const row = document.createElement('div');
+                row.className = 'trade-entry';
+                if (usdVal > 10000) row.style.background = d.m ? 'rgba(248,73,96,0.1)' : 'rgba(2,192,118,0.1)';
+                row.innerHTML = `
+                    <span style="color: #666;">${new Date(d.E).toLocaleTimeString()}</span>
+                    <span style="color: ${d.m ? 'var(--down)' : 'var(--up)'}">${parseFloat(d.p).toLocaleString()}</span>
+                    <span style="font-weight: bold;">$${Math.round(usdVal).toLocaleString()}</span>
+                `;
+                const feed = document.getElementById('trade-feed');
+                feed.insertBefore(row, feed.firstChild);
+                if (feed.childNodes.length > 40) feed.removeChild(feed.lastChild);
+            };
+        }
+
+        // Jalankan awal
+        loadChart('BTCUSDT');
+        getBinanceList();
+        startStream('BTCUSDT');
+    </script>
 </body>
 </html>
