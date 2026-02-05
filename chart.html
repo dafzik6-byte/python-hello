@@ -1,68 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bitcoin Candlestick Fix</title>
+    <title>Live Bitcoin Chart</title>
     <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         body { margin: 0; background-color: #131722; font-family: sans-serif; }
-        #chart-container { width: 100%; height: 500px; }
-        h2 { color: white; padding: 20px; }
+        #chart-container { width: 100%; height: 90vh; }
+        .status { color: #26a69a; padding: 10px 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h2>BTC/USD Candlestick (Fixed)</h2>
+    <div class="status">● LIVE BINANCE: BTC/USDT</div>
     <div id="chart-container"></div>
 
     <script>
-// 1. Tambahkan opsi untuk memperlebar batang (barSpacing)
-const chartOptions = { 
-    layout: { backgroundColor: '#131722', textColor: '#d1d4dc' },
-    width: window.innerWidth,
-    height: 500,
-    timeScale: {
-        barSpacing: 60,      // Semakin besar angka ini, semakin lebar batangnya
-        rightOffset: 10,     // Memberi sedikit ruang di sisi kanan
-    },
-};
+        const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
+            layout: { backgroundColor: '#131722', textColor: '#d1d4dc' },
+            grid: { vertLines: { color: '#2B2B43' }, horzLines: { color: '#2B2B43' } },
+            timeScale: { timeVisible: true, secondsVisible: false }
+        });
 
-const chart = LightweightCharts.createChart(document.getElementById('chart-container'), chartOptions);
+        const candleSeries = chart.addCandlestickSeries({
+            upColor: '#26a69a', downColor: '#ef5350', 
+            borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350'
+        });
 
-const candleSeries = chart.addCandlestickSeries({
-    upColor: '#26a69a', downColor: '#ef5350', 
-    borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350'
-});
+        // 1. KONEKSI KE BINANCE WEBSOCKET
+        // Kita mengambil data candlestick interval 1 menit (1m)
+        const binanceSocket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
 
-const data = [
-    { time: '2026-02-01', open: 95000, high: 97000, low: 94000, close: 96500 },
-    { time: '2026-02-02', open: 96500, high: 99000, low: 96000, close: 98000 },
-    { time: '2026-02-03', open: 98000, high: 101000, low: 97500, close: 100500 },
-    { time: '2026-02-04', open: 100500, high: 100800, low: 92000, close: 94000 },
-    { time: '2026-02-05', open: 94000, high: 98000, low: 93500, close: 97500 },
-    { time: '2026-02-06', open: 97500, high: 105000, low: 97000, close: 104500 }
-];
+        binanceSocket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            const candle = message.k;
 
-candleSeries.setData(data);
+            // 2. UPDATE CHART SECARA REAL-TIME
+            candleSeries.update({
+                time: candle.t / 1000, // Konversi milidetik ke detik
+                open: parseFloat(candle.o),
+                high: parseFloat(candle.h),
+                low: parseFloat(candle.l),
+                close: parseFloat(candle.c)
+            });
+        };
 
-// 2. Ini yang memaksa semua data terlihat memenuhi area yang tersedia
-chart.timeScale().fitContent();
-
-// Simulasi pergerakan harga pada candle terakhir
-setInterval(() => {
-    const lastData = data[data.length - 1];
-    
-    // Memberikan variasi harga acak sekitar +/- 100
-    const change = (Math.random() - 0.5) * 200;
-    const newClose = lastData.close + change;
-    
-    // Update data candle terakhir
-    candleSeries.update({
-        time: lastData.time,
-        open: lastData.open,
-        high: Math.max(lastData.high, newClose),
-        low: Math.min(lastData.low, newClose),
-        close: newClose
-    });
-}, 1000);
+        window.onresize = () => {
+            chart.resize(window.innerWidth, window.innerHeight);
+        };
     </script>
 </body>
 </html>
