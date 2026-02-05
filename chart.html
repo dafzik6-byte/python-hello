@@ -1,77 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>BTC/USDT Live & History</title>
-    <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+    <title>Binance Terminal Pro</title>
     <style>
-        body { margin: 0; background-color: #131722; font-family: sans-serif; }
-        #chart-container { width: 100%; height: 90vh; }
-        .status { color: #26a69a; padding: 10px 20px; font-weight: bold; }
+        /* Hilangkan semua margin dan padding */
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100vh; /* Kunci tinggi ke 100% layar */
+            background-color: #131722; 
+            overflow: hidden; 
+        }
+
+        /* Pastikan pembungkusnya juga 100% layar */
+        .tradingview-widget-container { 
+            width: 100%; 
+            height: 100vh; 
+        }
+
+        #tradingview_pro {
+            width: 100%;
+            height: 100vh;
+        }
     </style>
 </head>
 <body>
-    <div class="status" id="status">● LOADING DATA...</div>
-    <div id="chart-container"></div>
 
-    <script>
-        const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
-            layout: { backgroundColor: '#131722', textColor: '#d1d4dc' },
-            grid: { vertLines: { color: '#2B2B43' }, horzLines: { color: '#2B2B43' } },
-            timeScale: { timeVisible: true, secondsVisible: false }
-        });
-
-        const candleSeries = chart.addCandlestickSeries({
-            upColor: '#26a69a', downColor: '#ef5350', 
-            borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350'
-        });
-
-        const symbol = 'BTCUSDT';
-        const interval = '1m';
-
-        // 1. FUNGSI AMBIL DATA MASA LALU (REST API)
-        async function getHistory() {
-            const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`);
-            const data = await response.json();
-            
-            const historyData = data.map(d => ({
-                time: d[0] / 1000,
-                open: parseFloat(d[1]),
-                high: parseFloat(d[2]),
-                low: parseFloat(d[3]),
-                close: parseFloat(d[4])
-            }));
-
-            candleSeries.setData(historyData);
-            document.getElementById('status').innerText = '● LIVE BINANCE: BTC/USDT (1m)';
-            
-            // 2. SETELAH HISTORY MUNCUL, BARU CONNECT WEBSOCKET
-            connectWebSocket();
+    <div class="tradingview-widget-container">
+        <div id="tradingview_pro"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+        new TradingView.widget(
+        {
+            "width": "100%",        // Paksa lebar 100%
+            "height": "100%",       // Paksa tinggi 100%
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "1",
+            "timezone": "Asia/Jakarta",
+            "theme": "dark",
+            "style": "1",
+            "locale": "id",
+            "toolbar_bg": "#131722",
+            "enable_publishing": false,
+            "withdateranges": true,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_pro"
         }
+        );
+        </script>
+    </div>
 
-        // 2. FUNGSI UPDATE REAL-TIME (WEBSOCKET)
-        function connectWebSocket() {
-            const binanceSocket = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`);
-
-            binanceSocket.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-                const candle = message.k;
-
-                candleSeries.update({
-                    time: candle.t / 1000,
-                    open: parseFloat(candle.o),
-                    high: parseFloat(candle.h),
-                    low: parseFloat(candle.l),
-                    close: parseFloat(candle.c)
-                });
-            };
-        }
-
-        // Jalankan program
-        getHistory();
-
-        window.onresize = () => {
-            chart.resize(window.innerWidth, window.innerHeight);
-        };
-    </script>
 </body>
 </html>
