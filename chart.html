@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Binance Terminal Pro</title>
+    <title>Pro Trading Terminal - BTC</title>
     <style>
-        /* Hilangkan semua margin dan padding */
+        /* Paksa body dan html ambil 100% tinggi layar */
         html, body { 
             margin: 0; 
             padding: 0; 
+            height: 100%; 
             width: 100%; 
-            height: 100vh; /* Kunci tinggi ke 100% layar */
             background-color: #131722; 
-            overflow: hidden; 
+            overflow: hidden; /* Hilangkan scrollbar luar */
         }
 
-        /* Pastikan pembungkusnya juga 100% layar */
+        /* Container widget harus memenuhi sisa layar */
         .tradingview-widget-container { 
+            height: 100%; 
             width: 100%; 
-            height: 100vh; 
         }
 
         #tradingview_pro {
+            height: 100%;
             width: 100%;
-            height: 100vh;
         }
     </style>
 </head>
@@ -33,19 +33,24 @@
         <script type="text/javascript">
         new TradingView.widget(
         {
-            "width": "100%",        // Paksa lebar 100%
-            "height": "100%",       // Paksa tinggi 100%
+            "autosize": true, // Ini akan mengikuti ukuran container-nya
             "symbol": "BINANCE:BTCUSDT",
             "interval": "1",
             "timezone": "Asia/Jakarta",
             "theme": "dark",
             "style": "1",
             "locale": "id",
-            "toolbar_bg": "#131722",
+            "toolbar_bg": "#f1f3f6",
             "enable_publishing": false,
             "withdateranges": true,
             "hide_side_toolbar": false,
             "allow_symbol_change": true,
+            "details": true,
+            "hotlist": true,
+            "calendar": true,
+            "show_popup_button": true,
+            "popup_width": "1000",
+            "popup_height": "650",
             "container_id": "tradingview_pro"
         }
         );
