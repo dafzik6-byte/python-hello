@@ -2,65 +2,69 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Ultimate Live Terminal</title>
+    <title>Whale Hunter Pro + Audio Control</title>
     <style>
         :root { --bg: #0b0e11; --line: #2b2f36; --up: #02c076; --down: #f84960; --yellow: #fcd535; --gray: #848e9c; }
-        body { margin: 0; display: flex; height: 100vh; background: var(--bg); color: #eaecef; font-family: 'Inter', sans-serif; overflow: hidden; }
+        body { margin: 0; display: flex; height: 100vh; background: var(--bg); color: #eaecef; font-family: 'Inter', sans-serif; overflow: hidden; transition: background 0.1s; }
         
         /* PANEL KIRI */
         #left-panel { width: 320px; border-right: 1px solid var(--line); display: flex; flex-direction: column; background: #12161c; }
         .panel-header { padding: 20px; background: #181a20; border-bottom: 1px solid var(--line); }
-        .live-price-big { font-size: 28px; font-weight: 800; font-family: 'Roboto Mono'; margin: 5px 0; transition: color 0.1s; }
+        .live-price-big { font-size: 28px; font-weight: 800; font-family: 'Roboto Mono'; margin: 5px 0; }
         .stat-card { padding: 15px 20px; border-bottom: 1px solid var(--line); }
         .stat-label { color: var(--gray); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .stat-value { font-family: 'Roboto Mono'; font-size: 16px; font-weight: bold; color: white; margin-bottom: 12px; }
-        .glow-up { color: var(--up); text-shadow: 0 0 8px rgba(2, 192, 118, 0.4); }
-        .glow-down { color: var(--down); text-shadow: 0 0 8px rgba(248, 73, 96, 0.4); }
+        .stat-value { font-family: 'Roboto Mono'; font-size: 16px; font-weight: bold; margin-bottom: 12px; }
 
         /* PANEL TENGAH & KANAN */
         #chart-zone { flex: 1; border-right: 1px solid var(--line); }
-        #aggr-sidebar { width: 380px; display: flex; flex-direction: column; }
+        #aggr-sidebar { width: 380px; display: flex; flex-direction: column; background: #12161c; }
         .panel-control { padding: 15px; background: #181a20; border-bottom: 1px solid var(--line); position: relative; }
-        input { width: 100%; background: #2b3139; border: 1px solid #474d57; color: white; padding: 12px; border-radius: 4px; outline: none; }
-        #search-results { position: absolute; top: 65px; left: 15px; right: 15px; background: #2b3139; border: 1px solid var(--line); z-index: 1000; display: none; }
+        
+        input { width: 100%; background: #2b3139; border: 1px solid #474d57; color: white; padding: 10px; border-radius: 4px; outline: none; box-sizing: border-box; font-size: 13px; }
+        .limit-box { margin-top: 10px; display: flex; align-items: center; gap: 10px; }
+        .limit-box label { font-size: 10px; color: var(--yellow); white-space: nowrap; font-weight: bold; }
+
+        #trade-feed { flex: 1; overflow-y: hidden; font-family: 'Roboto Mono'; font-size: 11px; }
+        .trade-entry { display: flex; justify-content: space-between; padding: 6px 15px; border-bottom: 1px solid #1e2329; align-items: center; }
+        
+        /* WHALE ALERT EFFECT */
+        .whale-row { background: rgba(252, 213, 53, 0.25) !important; border-left: 5px solid var(--yellow); animation: highlight 1.5s ease; }
+        @keyframes highlight { from { background: rgba(255, 255, 255, 0.4); } to { background: rgba(252, 213, 53, 0.25); } }
+
+        /* VOLUME CONTROL */
+        .volume-monitor { padding: 15px; background: #181a20; border-top: 1px solid var(--line); position: relative; }
+        #mute-btn { position: absolute; right: 15px; top: -45px; background: #2b3139; border: 1px solid var(--line); color: var(--yellow); border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10; }
+        #mute-btn.muted { color: var(--gray); opacity: 0.6; }
+
+        .vol-bar-container { height: 8px; background: #2b3139; border-radius: 4px; overflow: hidden; display: flex; margin: 10px 0; }
+        #search-results { position: absolute; top: 115px; left: 15px; right: 15px; background: #2b3139; border: 1px solid var(--line); z-index: 1000; display: none; }
         .result-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #363c45; }
         .result-item:hover { background: #474d57; color: var(--yellow); }
-        
-        #trade-feed { flex: 1; overflow-y: hidden; font-family: 'Roboto Mono'; font-size: 11px; }
-        .trade-entry { display: flex; justify-content: space-between; padding: 6px 15px; border-bottom: 1px solid #1e2329; }
-        .volume-monitor { padding: 15px; background: #181a20; border-top: 1px solid var(--line); }
-        .vol-bar-container { height: 12px; background: #2b3139; border-radius: 6px; overflow: hidden; display: flex; margin: 8px 0; }
     </style>
 </head>
 <body>
 
     <div id="left-panel">
         <div class="panel-header">
-            <div id="coin-name" style="color: var(--yellow); font-weight: bold;">BITCOIN / USDT</div>
+            <div id="coin-name" style="color: var(--yellow); font-weight: bold;">BTC / USDT</div>
             <div id="live-price" class="live-price-big">$0.00</div>
-            <div id="price-change" style="font-size: 13px; font-weight: bold;">0.00%</div>
+            <div id="price-change" style="font-size: 13px;">0.00%</div>
         </div>
         
         <div class="stat-card">
-            <div class="stat-label">Real-Time Market Cap</div>
+            <div class="stat-label">Market Cap (Live)</div>
             <div class="stat-value" id="live-mkt-cap">$0</div>
-
-            <div class="stat-label">Real-Time FDV</div>
+            <div class="stat-label">FDV (Live)</div>
             <div class="stat-value" id="live-fdv">$0</div>
-
-            <div class="stat-label">24h Volume (Live)</div>
-            <div class="stat-value" id="live-vol-24h" style="color: var(--yellow);">$0</div>
+            <div class="stat-label">Vol 24h (Sync 07:00 WIB)</div>
+            <div class="stat-value" id="live-vol-24h" style="color: var(--yellow); font-size: 18px;">$0</div>
         </div>
 
         <div class="stat-card" style="background: #181a20; flex: 1;">
-            <div class="stat-label">Total Transactions (24h)</div>
-            <div class="stat-value" id="live-count-24h" style="font-size: 14px;">0</div>
-
-            <div class="stat-label">Circulating Supply</div>
-            <div class="stat-value" id="disp-circ" style="font-size: 13px; color: var(--gray);">0</div>
-
-            <div class="stat-label">Max Supply</div>
-            <div class="stat-value" id="disp-max" style="font-size: 13px; color: var(--gray);">0</div>
+            <div class="stat-label">Trades Count</div>
+            <div id="live-count-24h" class="stat-value" style="color: #00d2ff;">0</div>
+            <div class="stat-label">Circ. Supply</div>
+            <div id="disp-circ" class="stat-value" style="font-size: 12px; color: var(--gray);">0</div>
         </div>
     </div>
 
@@ -68,15 +72,22 @@
 
     <div id="aggr-sidebar">
         <div class="panel-control">
-            <input type="text" id="coin-search" placeholder="Search Pair (e.g. BTCUSDT)..." autocomplete="off">
+            <input type="text" id="coin-search" placeholder="Search (e.g. SOLUSDT)...">
+            <div class="limit-box">
+                <label>WHALE LIMIT ($)</label>
+                <input type="number" id="whale-input" value="50000">
+            </div>
             <div id="search-results"></div>
         </div>
-        <div id="trade-feed"></div>
+        
+        <div id="trade-feed" style="position: relative;"></div>
+        
         <div class="volume-monitor">
-            <div id="vol-total" style="font-size: 11px; margin-bottom: 5px;">Vol: $0</div>
+            <button id="mute-btn" title="Toggle Sound">🔊</button>
+            <div style="font-size: 10px; color: var(--gray); text-align: center; margin-bottom: 5px;">MOMENTUM (BUY VS SELL)</div>
             <div class="vol-bar-container">
-                <div id="buy-bar" style="width: 50%; background: var(--up);"></div>
-                <div id="sell-bar" style="width: 50%; background: var(--down);"></div>
+                <div id="buy-bar" style="width: 50%; background: var(--up); transition: 0.5s;"></div>
+                <div id="sell-bar" style="width: 50%; background: var(--down); transition: 0.5s;"></div>
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold;">
                 <span id="buy-pct" style="color: var(--up)">50%</span>
@@ -87,160 +98,127 @@
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-let tradeWS, allSymbols = [], tradeHistory = [];
-    let baseVol = 0, baseCount = 0, circSupply = 0, maxSupply = 0, lastP = 0;
-    let currentSymbol = 'BTCUSDT';
-
-    // 1. Logika Waktu Reset (07:00 WIB / 00:00 UTC)
-    function getResetTime() {
-        const now = new Date();
-        const reset = new Date();
-        reset.setUTCHours(0, 0, 0, 0); // Jam 00:00 UTC (Sama dengan 07:00 WIB)
+        const whaleSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+        let isMuted = false;
         
-        // Jika sekarang sudah lewat jam 7 pagi, maka reset berikutnya adalah besok jam 7 pagi
-        // Tapi kita ingin tahu kapan reset TERAKHIR terjadi
-        if (now < reset) {
-            reset.setUTCDate(reset.getUTCDate() - 1);
-        }
-        return reset.getTime();
-    }
+        let tradeWS, allSymbols = [], tradeHistory = [];
+        let baseVol = 0, baseCount = 0, circSupply = 0, maxSupply = 0, lastP = 0;
 
-    // 2. Fungsi Simpan ke Memori Browser
-    function saveToMemory(symbol, vol, count) {
-        const data = {
-            vol: vol,
-            count: count,
-            lastReset: getResetTime()
+        // Toggle Sound Function
+        document.getElementById('mute-btn').onclick = function() {
+            isMuted = !isMuted;
+            this.innerText = isMuted ? '' : '🔊';
+            this.classList.toggle('muted', isMuted);
         };
-        localStorage.setItem("market_data_" + symbol, JSON.stringify(data));
-    }
 
-    // 3. Fungsi Ambil dari Memori
-    function loadFromMemory(symbol) {
-        const saved = localStorage.getItem("market_data_" + symbol);
-        if (!saved) return null;
-
-        const data = JSON.parse(saved);
-        const lastReset = getResetTime();
-
-        // Jika data di memori berasal dari sebelum jam 7 pagi tadi, berarti sudah basi (Reset!)
-        if (data.lastReset < lastReset) {
-            localStorage.removeItem("market_data_" + symbol);
-            return null;
+        function getResetTime() {
+            const now = new Date();
+            const reset = new Date();
+            reset.setUTCHours(0, 0, 0, 0); 
+            if (now < reset) reset.setUTCDate(reset.getUTCDate() - 1);
+            return reset.getTime();
         }
-        return data;
-    }
 
-    async function fetchFundamental(symbol) {
-        try {
-            const id = symbol.replace('USDT', '').toLowerCase();
-            const map = { 'btc': 'bitcoin', 'eth': 'ethereum', 'sol': 'solana' };
-            const res = await fetch(`https://api.coingecko.com/api/v3/coins/${map[id] || id}`);
+        async function fetchFund(s) {
+            try {
+                const id = s.replace('USDT', '').toLowerCase();
+                const map = {'btc':'bitcoin','eth':'ethereum','sol':'solana','bnb':'binancecoin'};
+                const res = await fetch(`https://api.coingecko.com/api/v3/coins/${map[id]||id}`);
+                const d = await res.json();
+                circSupply = d.market_data.circulating_supply;
+                maxSupply = d.market_data.max_supply || d.market_data.total_supply || circSupply;
+                document.getElementById('disp-circ').innerText = circSupply.toLocaleString();
+            } catch(e) { circSupply = 0; }
+        }
+
+        async function startLive(symbol) {
+            if (tradeWS) tradeWS.close();
+            document.getElementById('coin-name').innerText = symbol.replace('USDT', '') + ' / USDT';
+            const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
             const d = await res.json();
-            circSupply = d.market_data.circulating_supply;
-            maxSupply = d.market_data.max_supply || d.market_data.total_supply || circSupply;
-            document.getElementById('disp-circ').innerText = circSupply.toLocaleString();
-            document.getElementById('disp-max').innerText = maxSupply.toLocaleString();
-        } catch (e) { circSupply = 0; maxSupply = 0; }
-    }
-
-    async function initData(symbol) {
-        currentSymbol = symbol;
-        const saved = loadFromMemory(symbol);
-        
-        // Ambil data resmi dari Binance sebagai cadangan
-        const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
-        const d = await res.json();
-
-        // Gunakan data memori jika ada, jika tidak pakai data Binance
-        if (saved) {
-            baseVol = saved.vol;
-            baseCount = saved.count;
-        } else {
-            baseVol = parseFloat(d.quoteVolume);
-            baseCount = parseInt(d.count);
-        }
-
-        document.getElementById('price-change').innerText = `${parseFloat(d.priceChangePercent).toFixed(2)}%`;
-        document.getElementById('price-change').style.color = d.priceChangePercent >= 0 ? 'var(--up)' : 'var(--down)';
-        await fetchFundamental(symbol);
-    }
-
-    function startLive(symbol) {
-        if (tradeWS) tradeWS.close();
-        document.getElementById('coin-name').innerText = symbol.replace('USDT', '') + ' / USDT';
-        
-        initData(symbol).then(() => {
-            tradeWS = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@aggTrade`);
             
+            const mem = JSON.parse(localStorage.getItem("mkt_" + symbol));
+            if (mem && mem.t === getResetTime()) {
+                baseVol = mem.v; baseCount = mem.c;
+            } else {
+                baseVol = parseFloat(d.quoteVolume); baseCount = parseInt(d.count);
+            }
+            
+            lastP = parseFloat(d.lastPrice);
+            document.getElementById('price-change').innerText = `${parseFloat(d.priceChangePercent).toFixed(2)}%`;
+            document.getElementById('price-change').style.color = d.priceChangePercent >= 0 ? 'var(--up)' : 'var(--down)';
+            fetchFund(symbol);
+
+            tradeWS = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@aggTrade`);
             tradeWS.onmessage = (e) => {
-                const d = JSON.parse(e.data);
-                const p = parseFloat(d.p), q = parseFloat(d.q), v = p * q;
-                
-                // Update Harga & Market Cap
+                const data = JSON.parse(e.data);
+                const p = parseFloat(data.p), v = p * parseFloat(data.q);
+                const limit = parseFloat(document.getElementById('whale-input').value) || 50000;
+
                 const pEl = document.getElementById('live-price');
                 pEl.className = `live-price-big ${p > lastP ? 'glow-up' : 'glow-down'}`;
                 pEl.innerText = `$${p.toLocaleString()}`;
-                
+
                 if(circSupply > 0) {
                     document.getElementById('live-mkt-cap').innerText = `$${Math.round(p * circSupply).toLocaleString()}`;
                     document.getElementById('live-fdv').innerText = `$${Math.round(p * maxSupply).toLocaleString()}`;
                 }
 
-                // Update Volume & Simpan
-                baseVol += v; 
-                baseCount++;
-                saveToMemory(symbol, baseVol, baseCount);
-
+                baseVol += v; baseCount++;
+                localStorage.setItem("mkt_" + symbol, JSON.stringify({v: baseVol, c: baseCount, t: getResetTime()}));
                 document.getElementById('live-vol-24h').innerText = `$${Math.round(baseVol).toLocaleString()}`;
                 document.getElementById('live-count-24h').innerText = baseCount.toLocaleString();
-                document.getElementById('vol-total').innerText = `Live Vol: $${Math.round(baseVol).toLocaleString()}`;
 
-                // Momentum Bar Logic
-                tradeHistory.push({ v, s: d.m });
-                if (tradeHistory.length > 100) tradeHistory.shift();
-                let bv = 0, sv = 0;
-                tradeHistory.forEach(t => t.s ? sv += t.v : bv += t.v);
-                const total = bv + sv;
-                document.getElementById('buy-bar').style.width = (bv/total*100) + '%';
-                document.getElementById('buy-pct').innerText = (bv/total*100).toFixed(1) + '%';
-                document.getElementById('sell-pct').innerText = (sv/total*100).toFixed(1) + '%';
+                let whaleClass = "";
+                if (v >= limit) {
+                    whaleClass = "whale-row";
+                    if(!isMuted) {
+                        whaleSound.currentTime = 0;
+                        whaleSound.play().catch(()=>{});
+                    }
+                    document.body.style.backgroundColor = "#222";
+                    setTimeout(() => document.body.style.backgroundColor = "#0b0e11", 100);
+                }
 
-                // Feed
-                const row = `<div class="trade-entry"><span>${new Date().toLocaleTimeString()}</span><span style="color:${d.m?'var(--down)':'var(--up)'}">${p.toFixed(2)}</span><b>$${Math.round(v).toLocaleString()}</b></div>`;
+                tradeHistory.push({v, s: data.m});
+                if(tradeHistory.length > 50) tradeHistory.shift();
+                let bv=0, sv=0; tradeHistory.forEach(t=> t.s?sv+=t.v:bv+=t.v);
+                const total = bv+sv;
+                document.getElementById('buy-bar').style.width = (bv/total*100)+'%';
+                document.getElementById('buy-pct').innerText = Math.round(bv/total*100)+'%';
+                document.getElementById('sell-pct').innerText = Math.round(sv/total*100)+'%';
+
+                const row = `<div class="trade-entry ${whaleClass}"><span>${v>=limit?'🐋 WHALE':new Date().toLocaleTimeString()}</span><span style="color:${data.m?'var(--down)':'var(--up)'};font-weight:bold">${p.toFixed(2)}</span><b style="${v>=limit?'color:var(--yellow)':''}">$${Math.round(v).toLocaleString()}</b></div>`;
                 const f = document.getElementById('trade-feed');
                 f.insertAdjacentHTML('afterbegin', row);
-                if (f.childNodes.length > 30) f.lastChild.remove();
-                
+                if (f.childNodes.length > 40) f.lastChild.remove();
                 lastP = p;
             };
+        }
+
+        function loadChart(s) {
+            new TradingView.widget({"autosize": true, "symbol": "BINANCE:"+s, "interval": "1", "theme": "dark", "container_id": "tv_engine", "hide_side_toolbar": false, "show_popup_button": true, "timezone": "Asia/Jakarta"});
+        }
+
+        fetch('https://api.binance.com/api/v3/exchangeInfo').then(r=>r.json()).then(d=>{
+            allSymbols = d.symbols.filter(s=>s.quoteAsset==='USDT').map(s=>s.symbol);
         });
-    }
 
-    // Logika Chart & Search tetap sama...
-    function loadChart(s) {
-        new TradingView.widget({"autosize": true, "symbol": "BINANCE:"+s, "interval": "1", "theme": "dark", "container_id": "tv_engine", "hide_side_toolbar": false, "show_popup_button": true});
-    }
+        document.getElementById('coin-search').addEventListener('input', (e)=>{
+            const v = e.target.value.toUpperCase();
+            const res = document.getElementById('search-results');
+            res.innerHTML = '';
+            if(v){
+                res.style.display='block';
+                allSymbols.filter(s=>s.includes(v)).slice(0,10).forEach(m=>{
+                    const i = document.createElement('div'); i.className='result-item'; i.innerText=m;
+                    i.onclick = () => { loadChart(m); startLive(m); res.style.display='none'; e.target.value=''; };
+                    res.appendChild(i);
+                });
+            } else res.style.display='none';
+        });
 
-    fetch('https://api.binance.com/api/v3/exchangeInfo').then(r => r.json()).then(d => {
-        allSymbols = d.symbols.filter(s => s.quoteAsset === 'USDT').map(s => s.symbol);
-    });
-
-    document.getElementById('coin-search').addEventListener('input', (e) => {
-        const v = e.target.value.toUpperCase();
-        const res = document.getElementById('search-results');
-        res.innerHTML = '';
-        if (v) {
-            res.style.display = 'block';
-            allSymbols.filter(s => s.includes(v)).slice(0, 10).forEach(m => {
-                const i = document.createElement('div'); i.className = 'result-item'; i.innerText = m;
-                i.onclick = () => { loadChart(m); startLive(m); res.style.display = 'none'; e.target.value = ''; };
-                res.appendChild(i);
-            });
-        } else res.style.display = 'none';
-    });
-
-    loadChart('BTCUSDT'); startLive('BTCUSDT');
+        loadChart('BTCUSDT'); startLive('BTCUSDT');
     </script>
 </body>
 </html>
