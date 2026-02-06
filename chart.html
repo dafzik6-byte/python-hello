@@ -87,59 +87,116 @@
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        let tradeWS, allSymbols = [], tradeHistory = [];
-        let baseVol = 0, baseCount = 0, circSupply = 0, maxSupply = 0, lastP = 0;
+let tradeWS, allSymbols = [], tradeHistory = [];
+    let baseVol = 0, baseCount = 0, circSupply = 0, maxSupply = 0, lastP = 0;
+    let currentSymbol = 'BTCUSDT';
 
-        async function fetchFundamental(symbol) {
-            try {
-                const id = symbol.replace('USDT', '').toLowerCase();
-                const map = { 'btc': 'bitcoin', 'eth': 'ethereum', 'sol': 'solana', 'bnb': 'binancecoin' };
-                const res = await fetch(`https://api.coingecko.com/api/v3/coins/${map[id] || id}`);
-                const d = await res.json();
-                circSupply = d.market_data.circulating_supply;
-                maxSupply = d.market_data.max_supply || d.market_data.total_supply || circSupply;
-                document.getElementById('disp-circ').innerText = circSupply.toLocaleString();
-                document.getElementById('disp-max').innerText = maxSupply.toLocaleString();
-            } catch (e) { circSupply = 0; maxSupply = 0; }
+    // 1. Logika Waktu Reset (07:00 WIB / 00:00 UTC)
+    function getResetTime() {
+        const now = new Date();
+        const reset = new Date();
+        reset.setUTCHours(0, 0, 0, 0); // Jam 00:00 UTC (Sama dengan 07:00 WIB)
+        
+        // Jika sekarang sudah lewat jam 7 pagi, maka reset berikutnya adalah besok jam 7 pagi
+        // Tapi kita ingin tahu kapan reset TERAKHIR terjadi
+        if (now < reset) {
+            reset.setUTCDate(reset.getUTCDate() - 1);
         }
+        return reset.getTime();
+    }
 
-        async function initData(symbol) {
-            const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+    // 2. Fungsi Simpan ke Memori Browser
+    function saveToMemory(symbol, vol, count) {
+        const data = {
+            vol: vol,
+            count: count,
+            lastReset: getResetTime()
+        };
+        localStorage.setItem("market_data_" + symbol, JSON.stringify(data));
+    }
+
+    // 3. Fungsi Ambil dari Memori
+    function loadFromMemory(symbol) {
+        const saved = localStorage.getItem("market_data_" + symbol);
+        if (!saved) return null;
+
+        const data = JSON.parse(saved);
+        const lastReset = getResetTime();
+
+        // Jika data di memori berasal dari sebelum jam 7 pagi tadi, berarti sudah basi (Reset!)
+        if (data.lastReset < lastReset) {
+            localStorage.removeItem("market_data_" + symbol);
+            return null;
+        }
+        return data;
+    }
+
+    async function fetchFundamental(symbol) {
+        try {
+            const id = symbol.replace('USDT', '').toLowerCase();
+            const map = { 'btc': 'bitcoin', 'eth': 'ethereum', 'sol': 'solana' };
+            const res = await fetch(`https://api.coingecko.com/api/v3/coins/${map[id] || id}`);
             const d = await res.json();
+            circSupply = d.market_data.circulating_supply;
+            maxSupply = d.market_data.max_supply || d.market_data.total_supply || circSupply;
+            document.getElementById('disp-circ').innerText = circSupply.toLocaleString();
+            document.getElementById('disp-max').innerText = maxSupply.toLocaleString();
+        } catch (e) { circSupply = 0; maxSupply = 0; }
+    }
+
+    async function initData(symbol) {
+        currentSymbol = symbol;
+        const saved = loadFromMemory(symbol);
+        
+        // Ambil data resmi dari Binance sebagai cadangan
+        const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+        const d = await res.json();
+
+        // Gunakan data memori jika ada, jika tidak pakai data Binance
+        if (saved) {
+            baseVol = saved.vol;
+            baseCount = saved.count;
+        } else {
             baseVol = parseFloat(d.quoteVolume);
             baseCount = parseInt(d.count);
-            document.getElementById('price-change').innerText = `${parseFloat(d.priceChangePercent).toFixed(2)}%`;
-            document.getElementById('price-change').style.color = d.priceChangePercent >= 0 ? 'var(--up)' : 'var(--down)';
-            await fetchFundamental(symbol);
         }
 
-        function startLive(symbol) {
-            if (tradeWS) tradeWS.close();
-            initData(symbol);
+        document.getElementById('price-change').innerText = `${parseFloat(d.priceChangePercent).toFixed(2)}%`;
+        document.getElementById('price-change').style.color = d.priceChangePercent >= 0 ? 'var(--up)' : 'var(--down)';
+        await fetchFundamental(symbol);
+    }
+
+    function startLive(symbol) {
+        if (tradeWS) tradeWS.close();
+        document.getElementById('coin-name').innerText = symbol.replace('USDT', '') + ' / USDT';
+        
+        initData(symbol).then(() => {
             tradeWS = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@aggTrade`);
             
             tradeWS.onmessage = (e) => {
                 const d = JSON.parse(e.data);
                 const p = parseFloat(d.p), q = parseFloat(d.q), v = p * q;
                 
-                // 1. Live Price & Color Flash
+                // Update Harga & Market Cap
                 const pEl = document.getElementById('live-price');
                 pEl.className = `live-price-big ${p > lastP ? 'glow-up' : 'glow-down'}`;
                 pEl.innerText = `$${p.toLocaleString()}`;
                 
-                // 2. Live Market Cap & FDV (FAST MATH)
                 if(circSupply > 0) {
                     document.getElementById('live-mkt-cap').innerText = `$${Math.round(p * circSupply).toLocaleString()}`;
                     document.getElementById('live-fdv').innerText = `$${Math.round(p * maxSupply).toLocaleString()}`;
                 }
 
-                // 3. Live Volume & Count
-                baseVol += v; baseCount++;
+                // Update Volume & Simpan
+                baseVol += v; 
+                baseCount++;
+                saveToMemory(symbol, baseVol, baseCount);
+
                 document.getElementById('live-vol-24h').innerText = `$${Math.round(baseVol).toLocaleString()}`;
                 document.getElementById('live-count-24h').innerText = baseCount.toLocaleString();
                 document.getElementById('vol-total').innerText = `Live Vol: $${Math.round(baseVol).toLocaleString()}`;
 
-                // 4. Momentum Bar
+                // Momentum Bar Logic
                 tradeHistory.push({ v, s: d.m });
                 if (tradeHistory.length > 100) tradeHistory.shift();
                 let bv = 0, sv = 0;
@@ -149,39 +206,41 @@
                 document.getElementById('buy-pct').innerText = (bv/total*100).toFixed(1) + '%';
                 document.getElementById('sell-pct').innerText = (sv/total*100).toFixed(1) + '%';
 
-                // 5. Feed
+                // Feed
                 const row = `<div class="trade-entry"><span>${new Date().toLocaleTimeString()}</span><span style="color:${d.m?'var(--down)':'var(--up)'}">${p.toFixed(2)}</span><b>$${Math.round(v).toLocaleString()}</b></div>`;
                 const f = document.getElementById('trade-feed');
                 f.insertAdjacentHTML('afterbegin', row);
                 if (f.childNodes.length > 30) f.lastChild.remove();
+                
                 lastP = p;
             };
-        }
-
-        function loadChart(s) {
-            new TradingView.widget({"autosize": true, "symbol": "BINANCE:"+s, "interval": "1", "theme": "dark", "container_id": "tv_engine", "hide_side_toolbar": false, "show_popup_button": true});
-        }
-
-        // Search & Init
-        fetch('https://api.binance.com/api/v3/exchangeInfo').then(r => r.json()).then(d => {
-            allSymbols = d.symbols.filter(s => s.quoteAsset === 'USDT').map(s => s.symbol);
         });
+    }
 
-        document.getElementById('coin-search').addEventListener('input', (e) => {
-            const v = e.target.value.toUpperCase();
-            const res = document.getElementById('search-results');
-            res.innerHTML = '';
-            if (v) {
-                res.style.display = 'block';
-                allSymbols.filter(s => s.includes(v)).slice(0, 10).forEach(m => {
-                    const i = document.createElement('div'); i.className = 'result-item'; i.innerText = m;
-                    i.onclick = () => { loadChart(m); startLive(m); res.style.display = 'none'; e.target.value = ''; };
-                    res.appendChild(i);
-                });
-            } else res.style.display = 'none';
-        });
+    // Logika Chart & Search tetap sama...
+    function loadChart(s) {
+        new TradingView.widget({"autosize": true, "symbol": "BINANCE:"+s, "interval": "1", "theme": "dark", "container_id": "tv_engine", "hide_side_toolbar": false, "show_popup_button": true});
+    }
 
-        loadChart('BTCUSDT'); startLive('BTCUSDT');
+    fetch('https://api.binance.com/api/v3/exchangeInfo').then(r => r.json()).then(d => {
+        allSymbols = d.symbols.filter(s => s.quoteAsset === 'USDT').map(s => s.symbol);
+    });
+
+    document.getElementById('coin-search').addEventListener('input', (e) => {
+        const v = e.target.value.toUpperCase();
+        const res = document.getElementById('search-results');
+        res.innerHTML = '';
+        if (v) {
+            res.style.display = 'block';
+            allSymbols.filter(s => s.includes(v)).slice(0, 10).forEach(m => {
+                const i = document.createElement('div'); i.className = 'result-item'; i.innerText = m;
+                i.onclick = () => { loadChart(m); startLive(m); res.style.display = 'none'; e.target.value = ''; };
+                res.appendChild(i);
+            });
+        } else res.style.display = 'none';
+    });
+
+    loadChart('BTCUSDT'); startLive('BTCUSDT');
     </script>
 </body>
 </html>
