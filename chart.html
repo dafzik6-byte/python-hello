@@ -1,178 +1,187 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Pro Terminal: Sync Volume & Search</title>
+    <meta charset="UTF-8">
+    <title>Ultimate Live Terminal</title>
     <style>
-        :root { --bg: #0b0e11; --line: #2b2f36; --up: #02c076; --down: #f84960; --yellow: #fcd535; }
+        :root { --bg: #0b0e11; --line: #2b2f36; --up: #02c076; --down: #f84960; --yellow: #fcd535; --gray: #848e9c; }
         body { margin: 0; display: flex; height: 100vh; background: var(--bg); color: #eaecef; font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        #chart-zone { flex: 1; border-right: 1px solid var(--line); position: relative; }
-        #aggr-sidebar { width: 400px; display: flex; flex-direction: column; background: var(--bg); }
-        
+        /* PANEL KIRI */
+        #left-panel { width: 320px; border-right: 1px solid var(--line); display: flex; flex-direction: column; background: #12161c; }
+        .panel-header { padding: 20px; background: #181a20; border-bottom: 1px solid var(--line); }
+        .live-price-big { font-size: 28px; font-weight: 800; font-family: 'Roboto Mono'; margin: 5px 0; transition: color 0.1s; }
+        .stat-card { padding: 15px 20px; border-bottom: 1px solid var(--line); }
+        .stat-label { color: var(--gray); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .stat-value { font-family: 'Roboto Mono'; font-size: 16px; font-weight: bold; color: white; margin-bottom: 12px; }
+        .glow-up { color: var(--up); text-shadow: 0 0 8px rgba(2, 192, 118, 0.4); }
+        .glow-down { color: var(--down); text-shadow: 0 0 8px rgba(248, 73, 96, 0.4); }
+
+        /* PANEL TENGAH & KANAN */
+        #chart-zone { flex: 1; border-right: 1px solid var(--line); }
+        #aggr-sidebar { width: 380px; display: flex; flex-direction: column; }
         .panel-control { padding: 15px; background: #181a20; border-bottom: 1px solid var(--line); position: relative; }
-        input { width: 100%; background: #2b2f36; border: 1px solid #474d57; color: white; padding: 12px; border-radius: 4px; box-sizing: border-box; outline: none; font-size: 14px; }
-        input:focus { border-color: var(--yellow); }
-
-        #search-results { 
-            position: absolute; top: 65px; left: 15px; right: 15px; 
-            background: #2b3139; border: 1px solid var(--line); border-radius: 4px; 
-            max-height: 300px; overflow-y: auto; z-index: 1000; display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-        .result-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #363c45; display: flex; justify-content: space-between; }
+        input { width: 100%; background: #2b3139; border: 1px solid #474d57; color: white; padding: 12px; border-radius: 4px; outline: none; }
+        #search-results { position: absolute; top: 65px; left: 15px; right: 15px; background: #2b3139; border: 1px solid var(--line); z-index: 1000; display: none; }
+        .result-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #363c45; }
         .result-item:hover { background: #474d57; color: var(--yellow); }
-
+        
+        #trade-feed { flex: 1; overflow-y: hidden; font-family: 'Roboto Mono'; font-size: 11px; }
+        .trade-entry { display: flex; justify-content: space-between; padding: 6px 15px; border-bottom: 1px solid #1e2329; }
         .volume-monitor { padding: 15px; background: #181a20; border-top: 1px solid var(--line); }
-        .vol-label { font-size: 11px; color: #848e9c; margin-bottom: 8px; font-weight: bold; display: flex; justify-content: space-between; }
-        .vol-bar-container { height: 14px; background: #2b3139; border-radius: 7px; overflow: hidden; display: flex; margin-bottom: 5px; border: 1px solid #363c45; }
-        #buy-bar { height: 100%; background: var(--up); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        #sell-bar { height: 100%; background: var(--down); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .vol-stats { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; font-family: 'Roboto Mono', monospace; }
-
-        #main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        #trade-feed { flex: 1; overflow-y: hidden; font-family: 'Roboto Mono', monospace; font-size: 11px; }
-        .trade-entry { display: flex; justify-content: space-between; padding: 7px 15px; border-bottom: 1px solid #1e2329; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .vol-bar-container { height: 12px; background: #2b3139; border-radius: 6px; overflow: hidden; display: flex; margin: 8px 0; }
     </style>
 </head>
 <body>
+
+    <div id="left-panel">
+        <div class="panel-header">
+            <div id="coin-name" style="color: var(--yellow); font-weight: bold;">BITCOIN / USDT</div>
+            <div id="live-price" class="live-price-big">$0.00</div>
+            <div id="price-change" style="font-size: 13px; font-weight: bold;">0.00%</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-label">Real-Time Market Cap</div>
+            <div class="stat-value" id="live-mkt-cap">$0</div>
+
+            <div class="stat-label">Real-Time FDV</div>
+            <div class="stat-value" id="live-fdv">$0</div>
+
+            <div class="stat-label">24h Volume (Live)</div>
+            <div class="stat-value" id="live-vol-24h" style="color: var(--yellow);">$0</div>
+        </div>
+
+        <div class="stat-card" style="background: #181a20; flex: 1;">
+            <div class="stat-label">Total Transactions (24h)</div>
+            <div class="stat-value" id="live-count-24h" style="font-size: 14px;">0</div>
+
+            <div class="stat-label">Circulating Supply</div>
+            <div class="stat-value" id="disp-circ" style="font-size: 13px; color: var(--gray);">0</div>
+
+            <div class="stat-label">Max Supply</div>
+            <div class="stat-value" id="disp-max" style="font-size: 13px; color: var(--gray);">0</div>
+        </div>
+    </div>
 
     <div id="chart-zone"><div id="tv_engine" style="height: 100%;"></div></div>
 
     <div id="aggr-sidebar">
         <div class="panel-control">
-            <input type="text" id="coin-search" placeholder="Cari Koin di Binance..." autocomplete="off">
+            <input type="text" id="coin-search" placeholder="Search Pair (e.g. BTCUSDT)..." autocomplete="off">
             <div id="search-results"></div>
         </div>
-
-        <div id="main-content">
-            <div style="font-size: 10px; color: #848e9c; padding: 10px 15px; display: flex; justify-content: space-between; background: #181a20; font-weight: bold; border-bottom: 1px solid var(--line);">
-                <span>TIME</span>
-                <span id="target-title" style="color: var(--yellow)">---</span>
-                <span>PRICE / VALUE</span>
-            </div>
-            <div id="trade-feed"></div>
-        </div>
-
+        <div id="trade-feed"></div>
         <div class="volume-monitor">
-            <div class="vol-label">
-                <span id="vol-symbol-label">BTCUSDT 24H RATIO</span>
-                <span id="vol-total" style="color: white;">$0</span>
-            </div>
+            <div id="vol-total" style="font-size: 11px; margin-bottom: 5px;">Vol: $0</div>
             <div class="vol-bar-container">
-                <div id="buy-bar" style="width: 50%;"></div>
-                <div id="sell-bar" style="width: 50%;"></div>
+                <div id="buy-bar" style="width: 50%; background: var(--up);"></div>
+                <div id="sell-bar" style="width: 50%; background: var(--down);"></div>
             </div>
-            <div class="vol-stats">
-                <span id="buy-pct" style="color: var(--up)">50% BUY</span>
-                <span id="sell-pct" style="color: var(--down)">50% SELL</span>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold;">
+                <span id="buy-pct" style="color: var(--up)">50%</span>
+                <span id="sell-pct" style="color: var(--down)">50%</span>
             </div>
         </div>
     </div>
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        let tradeWS;
-        let currentSymbol = 'BTCUSDT';
-        let allSymbols = [];
+        let tradeWS, allSymbols = [], tradeHistory = [];
+        let baseVol = 0, baseCount = 0, circSupply = 0, maxSupply = 0, lastP = 0;
 
-        async function getBinanceList() {
+        async function fetchFundamental(symbol) {
             try {
-                const r = await fetch('https://api.binance.com/api/v3/exchangeInfo');
-                const data = await r.json();
-                allSymbols = data.symbols.filter(s => s.status === 'TRADING' && s.quoteAsset === 'USDT').map(s => s.symbol);
-            } catch (e) { console.error("API Error"); }
+                const id = symbol.replace('USDT', '').toLowerCase();
+                const map = { 'btc': 'bitcoin', 'eth': 'ethereum', 'sol': 'solana', 'bnb': 'binancecoin' };
+                const res = await fetch(`https://api.coingecko.com/api/v3/coins/${map[id] || id}`);
+                const d = await res.json();
+                circSupply = d.market_data.circulating_supply;
+                maxSupply = d.market_data.max_supply || d.market_data.total_supply || circSupply;
+                document.getElementById('disp-circ').innerText = circSupply.toLocaleString();
+                document.getElementById('disp-max').innerText = maxSupply.toLocaleString();
+            } catch (e) { circSupply = 0; maxSupply = 0; }
         }
 
-        async function fetchVolumeData(symbol) {
-            try {
-                const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
-                const data = await response.json();
-                
-                // Kalkulasi Ratio berdasarkan sentimen harga 24 jam
-                const change = parseFloat(data.priceChangePercent);
-                let buyRatio = 50 + (change * 1.5); 
-                buyRatio = Math.min(Math.max(buyRatio, 10), 90); // Lock antara 10%-90%
-                let sellRatio = 100 - buyRatio;
-
-                // Update UI Volume Bar
-                document.getElementById('vol-symbol-label').innerText = `${symbol} 24H RATIO`;
-                document.getElementById('buy-bar').style.width = buyRatio + '%';
-                document.getElementById('sell-bar').style.width = sellRatio + '%';
-                document.getElementById('buy-pct').innerText = buyRatio.toFixed(1) + '% BUY';
-                document.getElementById('sell-pct').innerText = sellRatio.toFixed(1) + '% SELL';
-                document.getElementById('vol-total').innerText = 'Vol: $' + Math.round(data.quoteVolume).toLocaleString();
-            } catch (e) { console.log("Volume update failed"); }
+        async function initData(symbol) {
+            const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+            const d = await res.json();
+            baseVol = parseFloat(d.quoteVolume);
+            baseCount = parseInt(d.count);
+            document.getElementById('price-change').innerText = `${parseFloat(d.priceChangePercent).toFixed(2)}%`;
+            document.getElementById('price-change').style.color = d.priceChangePercent >= 0 ? 'var(--up)' : 'var(--down)';
+            await fetchFundamental(symbol);
         }
 
-        function loadChart(symbol) {
-            new TradingView.widget({
-                "autosize": true, "symbol": "BINANCE:" + symbol, "interval": "1", "theme": "dark",
-                "container_id": "tv_engine", "hide_side_toolbar": false, "allow_symbol_change": true,
-                "header_indicators": true, "header_settings": true, "enabled_features": ["header_widget"]
-            });
-        }
-
-        function startLiveTrade(symbol) {
+        function startLive(symbol) {
             if (tradeWS) tradeWS.close();
-            currentSymbol = symbol;
-            document.getElementById('target-title').innerText = symbol;
-            document.getElementById('trade-feed').innerHTML = '';
-            
-            // PENTING: Update Volume Bar segera saat ganti koin
-            fetchVolumeData(symbol);
-
+            initData(symbol);
             tradeWS = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@aggTrade`);
+            
             tradeWS.onmessage = (e) => {
                 const d = JSON.parse(e.data);
-                const price = parseFloat(d.p);
-                const val = price * d.q;
-                const row = document.createElement('div');
-                row.className = 'trade-entry';
-                if (val > 10000) row.style.fontWeight = 'bold';
-                row.innerHTML = `
-                    <span style="color:#848e9c">${new Date(d.E).toLocaleTimeString()}</span>
-                    <span style="color:${d.m ? 'var(--down)' : 'var(--up)'}">${price.toLocaleString()}</span>
-                    <span>$${Math.round(val).toLocaleString()}</span>
-                `;
-                const feed = document.getElementById('trade-feed');
-                feed.insertBefore(row, feed.firstChild);
-                if (feed.childNodes.length > 40) feed.removeChild(feed.lastChild);
+                const p = parseFloat(d.p), q = parseFloat(d.q), v = p * q;
+                
+                // 1. Live Price & Color Flash
+                const pEl = document.getElementById('live-price');
+                pEl.className = `live-price-big ${p > lastP ? 'glow-up' : 'glow-down'}`;
+                pEl.innerText = `$${p.toLocaleString()}`;
+                
+                // 2. Live Market Cap & FDV (FAST MATH)
+                if(circSupply > 0) {
+                    document.getElementById('live-mkt-cap').innerText = `$${Math.round(p * circSupply).toLocaleString()}`;
+                    document.getElementById('live-fdv').innerText = `$${Math.round(p * maxSupply).toLocaleString()}`;
+                }
+
+                // 3. Live Volume & Count
+                baseVol += v; baseCount++;
+                document.getElementById('live-vol-24h').innerText = `$${Math.round(baseVol).toLocaleString()}`;
+                document.getElementById('live-count-24h').innerText = baseCount.toLocaleString();
+                document.getElementById('vol-total').innerText = `Live Vol: $${Math.round(baseVol).toLocaleString()}`;
+
+                // 4. Momentum Bar
+                tradeHistory.push({ v, s: d.m });
+                if (tradeHistory.length > 100) tradeHistory.shift();
+                let bv = 0, sv = 0;
+                tradeHistory.forEach(t => t.s ? sv += t.v : bv += t.v);
+                const total = bv + sv;
+                document.getElementById('buy-bar').style.width = (bv/total*100) + '%';
+                document.getElementById('buy-pct').innerText = (bv/total*100).toFixed(1) + '%';
+                document.getElementById('sell-pct').innerText = (sv/total*100).toFixed(1) + '%';
+
+                // 5. Feed
+                const row = `<div class="trade-entry"><span>${new Date().toLocaleTimeString()}</span><span style="color:${d.m?'var(--down)':'var(--up)'}">${p.toFixed(2)}</span><b>$${Math.round(v).toLocaleString()}</b></div>`;
+                const f = document.getElementById('trade-feed');
+                f.insertAdjacentHTML('afterbegin', row);
+                if (f.childNodes.length > 30) f.lastChild.remove();
+                lastP = p;
             };
         }
 
-        // Search Engine Logic
-        const input = document.getElementById('coin-search');
-        const results = document.getElementById('search-results');
+        function loadChart(s) {
+            new TradingView.widget({"autosize": true, "symbol": "BINANCE:"+s, "interval": "1", "theme": "dark", "container_id": "tv_engine", "hide_side_toolbar": false, "show_popup_button": true});
+        }
 
-        input.addEventListener('input', () => {
-            const val = input.value.toUpperCase();
-            results.innerHTML = '';
-            if (val) {
-                const matches = allSymbols.filter(s => s.includes(val)).slice(0, 10);
-                results.style.display = 'block';
-                matches.forEach(m => {
-                    const item = document.createElement('div');
-                    item.className = 'result-item';
-                    item.innerHTML = `<span>${m}</span><small style="color:var(--yellow)">Trade Now</small>`;
-                    item.onclick = () => {
-                        loadChart(m);
-                        startLiveTrade(m); // Ini akan memicu fetchVolumeData(m)
-                        results.style.display = 'none';
-                        input.value = '';
-                    };
-                    results.appendChild(item);
-                });
-            } else { results.style.display = 'none'; }
+        // Search & Init
+        fetch('https://api.binance.com/api/v3/exchangeInfo').then(r => r.json()).then(d => {
+            allSymbols = d.symbols.filter(s => s.quoteAsset === 'USDT').map(s => s.symbol);
         });
 
-        // Init
-        getBinanceList();
-        loadChart('BTCUSDT');
-        startLiveTrade('BTCUSDT');
-        
-        // Auto refresh volume bar setiap 20 detik untuk koin yang sedang aktif
-        setInterval(() => fetchVolumeData(currentSymbol), 20000);
+        document.getElementById('coin-search').addEventListener('input', (e) => {
+            const v = e.target.value.toUpperCase();
+            const res = document.getElementById('search-results');
+            res.innerHTML = '';
+            if (v) {
+                res.style.display = 'block';
+                allSymbols.filter(s => s.includes(v)).slice(0, 10).forEach(m => {
+                    const i = document.createElement('div'); i.className = 'result-item'; i.innerText = m;
+                    i.onclick = () => { loadChart(m); startLive(m); res.style.display = 'none'; e.target.value = ''; };
+                    res.appendChild(i);
+                });
+            } else res.style.display = 'none';
+        });
+
+        loadChart('BTCUSDT'); startLive('BTCUSDT');
     </script>
 </body>
 </html>
