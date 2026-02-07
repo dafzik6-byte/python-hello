@@ -20,7 +20,18 @@
         #fg-value-display { font-size: 32px; font-weight: 900; color: white; font-family: 'Roboto Mono'; }
         #fg-status-text { font-size: 10px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
         .gauge-needle { position: absolute; bottom: 0; left: 50%; width: 3px; height: 75px; background: #fff; transform-origin: bottom center; transform: translateX(-50%) rotate(-90deg); transition: transform 2s cubic-bezier(0.17, 0.67, 0.83, 0.67); z-index: 5; }
-        #chart-zone { flex: 1; border-right: 1px solid var(--line); }
+        
+        /* Modifikasi Layout Chart Zone */
+        #chart-zone { flex: 1; border-right: 1px solid var(--line); display: flex; flex-direction: column; height: 100vh; }
+        #tv_engine { height: 70% !important; }
+        
+        /* Heatmap Styling */
+        #heatmap-container { height: 30%; background: #12161c; border-top: 2px solid var(--line); display: flex; flex-direction: column; }
+        #heatmap-header { padding: 8px 15px; background: #181a20; font-size: 10px; color: var(--yellow); font-weight: bold; letter-spacing: 1px; border-bottom: 1px solid var(--line); }
+        #heatmap-scroll-area { flex: 1; overflow-y: auto; padding: 5px; }
+        #heatmap-scroll-area::-webkit-scrollbar { width: 4px; }
+        #heatmap-scroll-area::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
+
         #aggr-sidebar { width: 380px; display: flex; flex-direction: column; background: #12161c; }
         .panel-control { padding: 15px; background: #181a20; border-bottom: 1px solid var(--line); position: relative; }
         input { width: 100%; background: #2b3139; border: 1px solid #474d57; color: white; padding: 10px; border-radius: 4px; outline: none; box-sizing: border-box; font-size: 13px; }
@@ -40,7 +51,6 @@
         .season-bar-bg { height: 6px; background: #2b3139; border-radius: 3px; overflow: hidden; display: flex; margin-top: 8px; }
         #season-progress { height: 100%; width: 50%; background: linear-gradient(90deg, #fcd535, #ff8c00, #02c076); transition: 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
 
-        /* Watchlist Styling */
         #listing-panel { padding: 15px 20px; border-bottom: 1px solid var(--line); flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         .listing-item { background: #181a20; padding: 10px; border-radius: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--yellow); transition: 0.3s; }
         .listing-item.released { border-left-color: #474d57; opacity: 0.6; }
@@ -104,7 +114,30 @@
         </div>
     </div>
 
-    <div id="chart-zone"><div id="tv_engine" style="height: 100%;"></div></div>
+    <div id="chart-zone">
+        <div id="tv_engine"></div>
+        
+        <div id="heatmap-container">
+            <div id="heatmap-header">NARRATIVE SECTOR HEATMAP</div>
+            <div id="heatmap-scroll-area">
+                <div class="tradingview-widget-container" style="height: 600px; width: 100%;">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-martket-quotes-heatmap.js" async>
+                    {
+                      "symbolGroups": [
+                        { "name": "Layer 1 / Top Cap", "symbols": [{ "name": "BINANCE:BTCUSDT" }, { "name": "BINANCE:ETHUSDT" }, { "name": "BINANCE:SOLUSDT" }, { "name": "BINANCE:BNBUSDT" }, { "name": "BINANCE:AVAXUSDT" }] },
+                        { "name": "AI & Decentralized Data", "symbols": [{ "name": "BINANCE:NEARUSDT" }, { "name": "BINANCE:FETUSDT" }, { "name": "BINANCE:RNDRUSDT" }, { "name": "BINANCE:TAOUSDT" }, { "name": "BINANCE:GRTUSDT" }] },
+                        { "name": "Memes Narrative", "symbols": [{ "name": "BINANCE:DOGEUSDT" }, { "name": "BINANCE:PEPEUSDT" }, { "name": "BINANCE:SHIBUSDT" }, { "name": "BINANCE:WIFUSDT" }, { "name": "BINANCE:BONKUSDT" }] },
+                        { "name": "DeFi / RWA", "symbols": [{ "name": "BINANCE:LINKUSDT" }, { "name": "BINANCE:UNIUSDT" }, { "name": "BINANCE:AAVEUSDT" }, { "name": "BINANCE:ONDOUSDT" }, { "name": "BINANCE:PENDLEUSDT" }] },
+                        { "name": "L2 Ecosystem", "symbols": [{ "name": "BINANCE:ARBUSDT" }, { "name": "BINANCE:OPUSDT" }, { "name": "BINANCE:MATICUSDT" }, { "name": "BINANCE:STRKUSDT" }] }
+                      ],
+                      "showSymbolLogo": true, "colorTheme": "dark", "isTransparent": true, "displayMode": "adaptive", "locale": "en"
+                    }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="aggr-sidebar">
         <div class="panel-control">
@@ -139,13 +172,8 @@
         let tradeWS, allSymbols = [], tradeHistory = [];
         let baseVol = 0, baseCount = 0, circSupply = 0, lastP = 0;
 
-        // --- WATCHLIST & AUTO-TOKENOMIC LOGIC ---
         let upcomingCoins = JSON.parse(localStorage.getItem('myWatchlist')) || [];
-        const tokenomicsDB = {
-            "MYX": "2026-02-07T23:30:00",
-            "MONAD": "2026-02-15T15:00:00",
-            "ZAMA": "2026-02-10T10:00:00"
-        };
+        const tokenomicsDB = { "MYX": "2026-02-07T23:30:00", "MONAD": "2026-02-15T15:00:00", "ZAMA": "2026-02-10T10:00:00" };
 
         function addCoinPrompt() {
             const name = prompt("Ketik Nama Koin (Contoh: MYX):").toUpperCase();
@@ -163,10 +191,7 @@
             saveAndRender();
         }
 
-        function saveAndRender() {
-            localStorage.setItem('myWatchlist', JSON.stringify(upcomingCoins));
-            renderWatchlist();
-        }
+        function saveAndRender() { localStorage.setItem('myWatchlist', JSON.stringify(upcomingCoins)); renderWatchlist(); }
 
         function renderWatchlist() {
             const container = document.getElementById('watchlist-container');
@@ -181,20 +206,12 @@
                     const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
                     tStr = `${d}d ${h}h ${m}m ${s}s`;
                 }
-                container.innerHTML += `
-                    <div class="listing-item ${isReleased ? 'released' : ''}">
-                        <div><b style="font-size:13px">${c.name}</b><div style="font-size:8px; color:var(--gray)">${c.time.split('T')[0]}</div></div>
-                        <div style="text-align:right">
-                            <div style="font-family:'Roboto Mono'; font-size:11px; color:${isReleased ? 'var(--up)' : 'var(--yellow)'}">${tStr}</div>
-                            <span onclick="delCoin(${i})" style="color:var(--down); font-size:9px; cursor:pointer">DEL</span>
-                        </div>
-                    </div>`;
+                container.innerHTML += `<div class="listing-item ${isReleased ? 'released' : ''}"><div><b style="font-size:13px">${c.name}</b><div style="font-size:8px; color:var(--gray)">${c.time.split('T')[0]}</div></div><div style="text-align:right"><div style="font-family:'Roboto Mono'; font-size:11px; color:${isReleased ? 'var(--up)' : 'var(--yellow)'}">${tStr}</div><span onclick="delCoin(${i})" style="color:var(--down); font-size:9px; cursor:pointer">DEL</span></div></div>`;
             });
         }
         function delCoin(i) { upcomingCoins.splice(i, 1); saveAndRender(); }
         setInterval(renderWatchlist, 1000);
 
-        // --- EXISTING LOGIC ---
         const coinMap = { 'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana', 'BNB': 'binancecoin', 'XRP': 'ripple', 'ADA': 'cardano', 'DOGE': 'dogecoin' };
         const savedLimit = localStorage.getItem('whaleLimit');
         if (savedLimit) document.getElementById('whale-input').value = savedLimit;
@@ -269,11 +286,7 @@
                 document.getElementById('buy-bar').style.width = (bv/total*100)+'%';
                 document.getElementById('buy-pct').innerText = Math.round(bv/total*100)+'%';
                 document.getElementById('sell-pct').innerText = Math.round(sv/total*100)+'%';
-                const row = `<div class="trade-entry ${isWhale ? 'whale-row' : ''}">
-                    <span>${isWhale ? '🐋 WHALE' : new Date().toLocaleTimeString([], {hour12:false})}</span>
-                    <span style="color:${data.m ? 'var(--down)' : 'var(--up)'}; font-weight:bold">${p.toFixed(symbol.includes('BTC') ? 2 : 4)}</span>
-                    <b style="${isWhale ? 'color:var(--yellow)' : ''}">$${Math.round(v).toLocaleString()}</b>
-                </div>`;
+                const row = `<div class="trade-entry ${isWhale ? 'whale-row' : ''}"><span>${isWhale ? '🐋 WHALE' : new Date().toLocaleTimeString([], {hour12:false})}</span><span style="color:${data.m ? 'var(--down)' : 'var(--up)'}; font-weight:bold">${p.toFixed(symbol.includes('BTC') ? 2 : 4)}</span><b style="${isWhale ? 'color:var(--yellow)' : ''}">$${Math.round(v).toLocaleString()}</b></div>`;
                 const f = document.getElementById('trade-feed');
                 f.insertAdjacentHTML('afterbegin', row);
                 if (f.childNodes.length > 40) f.lastChild.remove();
