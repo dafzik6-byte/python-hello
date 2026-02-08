@@ -40,6 +40,23 @@ body {
     transition: color 0.2s; 
 }
 
+#disp-max {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+#realized-momentum {
+    background: linear-gradient(90deg, transparent, #bd93f9) !important;
+}
+
+.stat-value {
+    font-variant-numeric: tabular-nums; /* Membuat lebar setiap angka sama */
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    transition: color 0.5s ease;
+}
+
 .stat-card { 
     padding: 15px 20px; 
     border-bottom: 1px solid var(--line); 
@@ -207,16 +224,45 @@ input {
 #trade-feed { 
     flex: 1; 
     overflow-y: hidden; 
-    font-family: 'Roboto Mono'; 
-    font-size: 11px; 
+    font-family: 'Roboto Mono', monospace; 
+    font-size: 11px;
+    background-color: #0a0a0b; /* Hitam pekat untuk kedalaman */
+    color: #848e9c; /* Warna teks default yang redup */
 }
 
 .trade-entry { 
     display: flex; 
     justify-content: space-between; 
-    padding: 6px 15px; 
-    border-bottom: 1px solid #1e2329; 
-    align-items: center; 
+    padding: 4px 12px; /* Lebih rapat untuk kesan data-heavy */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03); /* Garis tipis transparan */
+    align-items: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+/* Efek Glow saat ada hover */
+.trade-entry:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+    color: #ffffff;
+    cursor: crosshair; /* Cursor pro look */
+}
+
+/* Detail Pro: Angka Harga */
+.trade-price {
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+/* Aksen Warna Misterius (Neon Red/Green yang diredam) */
+.trade-buy { color: #00ffaa; text-shadow: 0 0 5px rgba(0, 255, 170, 0.3); }
+.trade-sell { color: #ff3b5c; text-shadow: 0 0 5px rgba(255, 59, 92, 0.3); }
+
+/* Scrollbar Tersembunyi tapi Elegan */
+#trade-feed::-webkit-scrollbar {
+    width: 2px;
+}
+#trade-feed::-webkit-scrollbar-thumb {
+    background: #2b2f36;
 }
 
 .whale-row { 

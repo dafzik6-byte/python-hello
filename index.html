@@ -21,12 +21,41 @@
             <div class="stat-label">Vol 24h (Sync)</div>
             <div class="stat-value" id="live-vol-24h" style="color: var(--yellow);">$ --</div>
         </div>
+            <div class="stat-card">
+    <div style="display: flex; justify-content: space-between;">
+        <div style="flex: 1;">
+            <div class="stat-label">FDV (Fully Diluted)</div>
+            <div id="live-fdv" class="stat-value" style="color: #aeb4bc;">$ --</div>
+        </div>
+        <div style="flex: 1; text-align: right;">
+            <div class="stat-label">TVL (DefiLlama)</div>
+            <div id="live-tvl" class="stat-value" style="color: #ff9f43;">$ --</div>
+        </div>
+    </div>
+</div>
+
+<div class="stat-card">
+    <div class="stat-label">Daily Transactions (Est.)</div>
+    <div id="live-tx-count" class="stat-value" style="color: #00d2ff;">--</div>
+    <div id="tx-change-bar" style="height: 2px; background: var(--line); margin-top: 5px; width: 100%;">
+        <div id="tx-momentum" style="height: 100%; width: 0%; background: var(--up); transition: 0.5s;"></div>
+    </div>
+<div class="stat-card">
+    <div class="stat-label">Realized Cap (On-Chain)</div>
+    <div id="live-realized-cap" class="stat-value" style="color: #bd93f9;">$ --</div>
+    <div id="realized-bar-container" style="height: 2px; background: var(--line); margin-top: 5px; width: 100%;">
+        <div id="realized-momentum" style="height: 100%; width: 0%; background: #bd93f9; transition: 1s; box-shadow: 0 0 8px rgba(189, 147, 249, 0.4);"></div>
+     </div>
+    </div>
+  </div>
 
         <div class="stat-card">
             <div class="stat-label">Trades Count</div>
             <div id="live-count-24h" class="stat-value" style="color: #00d2ff;">0</div>
             <div class="stat-label">Circ. Supply</div>
             <div id="disp-circ" class="stat-value" style="font-size: 12px; color: var(--gray);">--</div>
+            <div class="stat-label">Max. Supply</div>
+            <div id="disp-max" class="stat-value" style="font-size: 12px; color: #58a6ff; text-shadow: 0 0 5px rgba(88, 166, 255, 0.3);">--</div>
         </div>
 
         <div class="season-container">

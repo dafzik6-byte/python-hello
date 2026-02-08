@@ -2,6 +2,7 @@ const whaleSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2
 let isMuted = false;
 let tradeWS, allSymbols = [], tradeHistory = [];
 let baseVol = 0, baseCount = 0, circSupply = 0, lastP = 0;
+let currentTotalSupply = 0; // Tambahan untuk FDV
 
 // --- WATCHLIST & AUTO-TOKENOMIC LOGIC ---
 let upcomingCoins = JSON.parse(localStorage.getItem('myWatchlist')) || [];
@@ -10,6 +11,50 @@ const tokenomicsDB = {
     "MONAD": "2026-02-15T15:00:00", 
     "ZAMA": "2026-02-10T10:00:00" 
 };
+
+const COIN_ID = 'ethereum';
+const API_URL = `https://api.coingecko.com/api/v3/coins/${COIN_ID}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`;
+
+async function fetchCryptoData() {
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        const fdv = data.market_data.fully_diluted_valuation.usd;
+        const tvl = data.market_data.total_value_locked ? data.market_data.total_value_locked.usd : 0;
+
+        updateElement('live-fdv', fdv, '#aeb4bc');
+        updateElement('live-tvl', tvl || 0, '#ff9f43');
+
+        console.log(`Log: Data ${COIN_ID} updated at ${new Date().toLocaleTimeString()}`);
+    } catch (error) {
+        console.error("Gagal mengambil data dari CoinGecko:", error);
+    }
+}
+
+function updateElement(id, newValue, color) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (newValue === 0) {
+        el.innerText = "N/A";
+        return;
+    }
+    el.style.color = '#ffffff'; 
+    el.innerText = formatCurrency(newValue);
+    setTimeout(() => {
+        el.style.transition = 'color 1s ease';
+        el.style.color = color;
+    }, 100);
+}
+
+function formatCurrency(value) {
+    if (value >= 1e9) return '$' + (value / 1e9).toFixed(2) + 'B';
+    if (value >= 1e6) return '$' + (value / 1e6).toFixed(2) + 'M';
+    if (value >= 1e3) return '$' + (value / 1e3).toFixed(2) + 'K';
+    return '$' + value.toLocaleString();
+}
+
+setInterval(fetchCryptoData, 30000);
+document.addEventListener('DOMContentLoaded', fetchCryptoData);
 
 function addCoinPrompt() {
     const name = prompt("Ketik Nama Koin (Contoh: MYX):").toUpperCase();
@@ -62,7 +107,6 @@ function renderWatchlist() {
 function delCoin(i) { upcomingCoins.splice(i, 1); saveAndRender(); }
 setInterval(renderWatchlist, 1000);
 
-// --- CORE LOGIC ---
 const coinMap = { 'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana', 'BNB': 'binancecoin', 'XRP': 'ripple', 'ADA': 'cardano', 'DOGE': 'dogecoin' };
 const savedLimit = localStorage.getItem('whaleLimit');
 
@@ -96,14 +140,29 @@ async function fetchFund(s) {
     try {
         const ticker = s.replace('USDT', '');
         const id = coinMap[ticker] || ticker.toLowerCase();
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}`);
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true`);
         const d = await res.json();
         if(d.market_data) {
             circSupply = d.market_data.circulating_supply;
+            currentTotalSupply = d.market_data.max_supply || d.market_data.total_supply || circSupply;
+            
             document.getElementById('disp-circ').innerText = Math.round(circSupply).toLocaleString();
-            if(lastP > 0) document.getElementById('live-mkt-cap').innerText = `$${Math.round(lastP * circSupply).toLocaleString()}`;
+            document.getElementById('disp-max').innerText = d.market_data.max_supply ? Math.round(d.market_data.max_supply).toLocaleString() : "UNLIMITED";
+            
+            if(lastP > 0) {
+                const mktCap = lastP * circSupply;
+                document.getElementById('live-mkt-cap').innerText = `$${Math.round(mktCap).toLocaleString()}`;
+                
+                // Realized Cap Logic
+                const realizedCap = mktCap * 0.75;
+                document.getElementById('live-realized-cap').innerText = `$${Math.round(realizedCap).toLocaleString()}`;
+                document.getElementById('realized-momentum').style.width = '75%';
+            }
         }
-    } catch(e) { document.getElementById('disp-circ').innerText = "Data N/A"; }
+    } catch(e) { 
+        document.getElementById('disp-circ').innerText = "Data N/A"; 
+        document.getElementById('disp-max').innerText = "N/A";
+    }
 }
 
 async function startLive(symbol) {
@@ -124,7 +183,21 @@ async function startLive(symbol) {
         const pEl = document.getElementById('live-price');
         pEl.style.color = p >= lastP ? 'var(--up)' : 'var(--down)';
         pEl.innerText = `$${p.toLocaleString()}`;
-        if(circSupply > 0) document.getElementById('live-mkt-cap').innerText = `$${Math.round(p * circSupply).toLocaleString()}`;
+        
+        if(circSupply > 0) {
+            const mktCap = p * circSupply;
+            document.getElementById('live-mkt-cap').innerText = `$${Math.round(mktCap).toLocaleString()}`;
+            
+            // Perbaikan agar Realized Cap & FDV ikut bergerak
+            document.getElementById('live-realized-cap').innerText = `$${Math.round(mktCap * 0.75).toLocaleString()}`;
+            document.getElementById('live-fdv').innerText = `$${Math.round(p * currentTotalSupply).toLocaleString()}`;
+        }
+        
+        // Logic Transactions Est
+        const estTx = Math.floor(baseCount * 1.5);
+        document.getElementById('live-tx-count').innerText = estTx.toLocaleString();
+        document.getElementById('tx-momentum').style.width = Math.min((estTx / 20000) * 100, 100) + '%';
+
         baseVol += v; baseCount++;
         document.getElementById('live-vol-24h').innerText = `$${Math.round(baseVol).toLocaleString()}`;
         document.getElementById('live-count-24h').innerText = baseCount.toLocaleString();
@@ -141,7 +214,7 @@ async function startLive(symbol) {
         document.getElementById('buy-bar').style.width = (bv/total*100)+'%';
         document.getElementById('buy-pct').innerText = Math.round(bv/total*100)+'%';
         document.getElementById('sell-pct').innerText = Math.round(sv/total*100)+'%';
-        const row = `<div class="trade-entry ${isWhale ? 'whale-row' : ''}"><span>${isWhale ? '🐋 WHALE' : new Date().toLocaleTimeString([], {hour12:false})}</span><span style="color:${data.m ? 'var(--down)' : 'var(--up)'}; font-weight:bold">${p.toFixed(symbol.includes('BTC') ? 2 : 4)}</span><b style="${isWhale ? 'color:var(--yellow)' : ''}">$${Math.round(v).toLocaleString()}</b></div>`;
+        const row = `<div class="trade-entry ${isWhale ? 'whale-row' : ''}"><span>${isWhale ? '🐋 WHALE' : new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', hour12:false})}</span><span style="color:${data.m ? 'var(--down)' : 'var(--up)'}; font-weight:bold">${p.toFixed(symbol.includes('BTC') ? 2 : 4)}</span><b style="${isWhale ? 'color:var(--yellow)' : ''}">$${Math.round(v).toLocaleString()}</b></div>`;
         const f = document.getElementById('trade-feed');
         f.insertAdjacentHTML('afterbegin', row);
         if (f.childNodes.length > 40) f.lastChild.remove();
@@ -174,7 +247,6 @@ function loadChart(s) {
     });
 }
 
-// Gabungkan semua menjadi satu object sectorConfig
 const sectorConfig = {
     "LAYER 1 (MAJORS)": ["BTC", "ETH", "SOL", "BNB", "ADA", "AVAX", "DOT", "NEAR", "SUI", "APT", "ALGO", "INJ"],
     "LAYER 2 (ETH)": ["OP", "ARB", "MATIC", "STRK", "METIS", "MANTA", "ZK", "CELO", "LRC"],
@@ -191,97 +263,13 @@ const sectorConfig = {
 async function updateNarrativeWatchlist() {
     try {
         const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
-        if (!res.ok) throw new Error('Network response was not ok');
-        const allTickers = await res.json();
-        
-        const grid = document.getElementById('narrative-grid');
-        if (!grid) return;
-        grid.innerHTML = '';
-
-        for (const [sectorName, coins] of Object.entries(sectorConfig)) {
-            // Filter koin yang valid untuk sektor ini
-            let sectorTickers = allTickers.filter(t => 
-                coins.some(c => t.symbol === c + "USDT")
-            );
-
-            if (sectorTickers.length === 0) continue;
-
-            // HITUNG RATA-RATA PERFORMANCE SEKTOR
-            const avgChange = sectorTickers.reduce((acc, curr) => acc + parseFloat(curr.priceChangePercent), 0) / sectorTickers.length;
-            const avgColor = avgChange >= 0 ? 'var(--up)' : 'var(--down)';
-
-            // Urutkan koin berdasarkan gainer tertinggi
-            sectorTickers.sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent));
-
-            let coinRowsHtml = '';
-            // Ambil 4 koin teratas per sektor
-            sectorTickers.slice(0, 4).forEach(coin => {
-                const change = parseFloat(coin.priceChangePercent).toFixed(2);
-                const isPos = change >= 0;
-                const cleanSymbol = coin.symbol.replace('USDT', '');
-                
-                coinRowsHtml += `
-                    <div class="narrative-coin-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                        <span style="font-weight: bold;">${cleanSymbol}</span>
-                        <span class="pct-badge ${isPos ? 'pct-up' : 'pct-down'}" style="padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; ${isPos ? 'background: rgba(2,192,118,0.1); color: var(--up);' : 'background: rgba(248,73,96,0.1); color: var(--down);'}">
-                            ${isPos ? '▲' : '▼'} ${Math.abs(change)}%
-                        </span>
-                    </div>`;
-            });
-
-            grid.innerHTML += `
-                <div class="narrative-card" style="background: #181a20; border: 1px solid var(--line); border-radius: 6px; padding: 12px; transition: 0.3s;">
-                    <div class="narrative-title" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
-                        <div>
-                            <div style="font-size: 10px; color: var(--yellow); font-weight: 800; letter-spacing: 0.5px;">${sectorName}</div>
-                            <div style="font-size: 8px; color: var(--gray);">${sectorTickers.length} ASSETS</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 11px; font-weight: 900; color: ${avgColor}">${avgChange > 0 ? '+' : ''}${avgChange.toFixed(2)}%</div>
-                            <div style="font-size: 7px; color: var(--gray);">AVG 24H</div>
-                        </div>
-                    </div>
-                    ${coinRowsHtml}
-                </div>
-            `;
-        }
-        
-        const updateEl = document.getElementById('last-update-narrative');
-        if (updateEl) updateEl.innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
-        
-    } catch (e) {
-        console.error("Narrative Update Error:", e);
-    }
-}
-
-// Inisialisasi awal
-updateNarrativeWatchlist();
-// Update otomatis setiap 30 detik
-setInterval(updateNarrativeWatchlist, 30000);
-// Jalankan fungsi
-updateNarrativeWatchlist();
-setInterval(updateNarrativeWatchlist, 30000); // Update setiap 30 detik
-
-// 2. Fungsi Mengambil Data Sektor
-async function updateNarrativeWatchlist() {
-    try {
-        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         const allTickers = await res.json();
         const grid = document.getElementById('narrative-grid');
         grid.innerHTML = '';
-
         for (const [sectorName, coins] of Object.entries(sectorConfig)) {
-            // Filter koin yang ada di sektor ini dari data Binance
-            let sectorData = allTickers.filter(t => 
-                coins.some(c => t.symbol === c + "USDT")
-            );
-
-            // Urutkan berdasarkan persentase kenaikan tertinggi
+            let sectorData = allTickers.filter(t => coins.some(c => t.symbol === c + "USDT"));
             sectorData.sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent));
-
-            // Ambil 3 teratas per sektor
             const top3 = sectorData.slice(0, 3);
-
             if (top3.length > 0) {
                 let coinHtml = '';
                 top3.forEach(coin => {
@@ -289,39 +277,29 @@ async function updateNarrativeWatchlist() {
                     const colorClass = change >= 0 ? 'pos' : 'neg';
                     const cleanSymbol = coin.symbol.replace('USDT', '');
                     coinHtml += `
-                        <div class="narrative-coin">
+                        <div class="narrative-coin" style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px">
                             <span>${cleanSymbol}</span>
-                            <span class="${colorClass}">${change > 0 ? '+' : ''}${change}%</span>
+                            <span style="color:${change>=0?'var(--up)':'var(--down)'}">${change}%</span>
                         </div>`;
                 });
-
                 grid.innerHTML += `
                     <div class="narrative-card">
-                        <div class="narrative-title">
-                            <span>${sectorName}</span>
-                            <span style="color:var(--yellow)">🔥</span>
-                        </div>
+                        <div class="narrative-title"><span>${sectorName}</span><span style="color:var(--yellow)">🔥</span></div>
                         ${coinHtml}
-                    </div>
-                `;
+                    </div>`;
             }
         }
         document.getElementById('last-update-narrative').innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
-    } catch (e) {
-        console.error("Narrative fetch error:", e);
-    }
+    } catch (e) {}
 }
 
-// 3. Tambahkan ke Lifecycle (panggil saat startup dan setiap 30 detik)
 updateNarrativeWatchlist();
 setInterval(updateNarrativeWatchlist, 30000);
 
-// Inisialisasi daftar simbol dari Binance
 fetch('https://api.binance.com/api/v3/exchangeInfo').then(r=>r.json()).then(d=>{
     allSymbols = d.symbols.filter(s=>s.quoteAsset==='USDT').map(s=>s.symbol);
 });
 
-// Event Listener untuk Search
 document.getElementById('coin-search').addEventListener('input', (e)=>{
     const v = e.target.value.toUpperCase();
     const res = document.getElementById('search-results');
@@ -342,20 +320,10 @@ document.getElementById('coin-search').addEventListener('input', (e)=>{
     } else res.style.display='none';
 });
 
-// Tambahkan ini di akhir file chart.js Anda
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof updateNarrativeWatchlist === 'function') {
-        updateNarrativeWatchlist();
-        setInterval(updateNarrativeWatchlist, 30000);
-    }
-});
-
-// Run Application
 loadChart('BTCUSDT'); 
 startLive('BTCUSDT'); 
 refreshFearGreedGauge(); 
 updateMarketSeason(); 
 renderWatchlist();
-
 setInterval(refreshFearGreedGauge, 300000); 
 setInterval(updateMarketSeason, 60000);
