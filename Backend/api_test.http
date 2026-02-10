@@ -1,0 +1,14 @@
+### Tes Koneksi
+GET http://localhost:5000/status
+
+###
+
+### Tambah Blok Baru
+POST http://localhost:5000/mine
+Content-Type: application/json
+
+{
+    "symbol": "DAFZIK_MOON",
+    "price": "1000000",
+    "note": "Ini blok pertama lewat API!"
+}

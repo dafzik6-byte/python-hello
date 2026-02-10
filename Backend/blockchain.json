@@ -1,0 +1,826 @@
+[
+    {
+        "index": 0,
+        "timestamp": "01/01/2026",
+        "data": "Genesis Block",
+        "previousHash": "0",
+        "nonce": 0,
+        "hash": "880ee2b27409e1e45949e7f5d744190df1b2c1953050a6baf0084680f230719e"
+    },
+    {
+        "index": 1,
+        "timestamp": "10/02/2026, 03.31.21",
+        "data": {
+            "amount": 50,
+            "sender": "Alice",
+            "receiver": "Bob"
+        },
+        "previousHash": "880ee2b27409e1e45949e7f5d744190df1b2c1953050a6baf0084680f230719e",
+        "nonce": 15688,
+        "hash": "000092a012f0237281149bfdd72b183f6441fddc1be6557624d342101c0ce800"
+    },
+    {
+        "index": 2,
+        "timestamp": "10/02/2026, 03.55.22",
+        "data": {
+            "symbol": "BTCUSDT",
+            "price": "95,432.10",
+            "marketCap": "1.89T",
+            "analysis": "Bullish Strong"
+        },
+        "previousHash": "000092a012f0237281149bfdd72b183f6441fddc1be6557624d342101c0ce800",
+        "nonce": 2819,
+        "hash": "000be0a9987ca5c30a02f3fbf5674a95b2c0cc85ec99cfc4d9adc1e85c00d766"
+    },
+    {
+        "index": 3,
+        "timestamp": "10/02/2026, 03.55.22",
+        "data": {
+            "symbol": "ETHUSDT",
+            "price": "2,745.50",
+            "marketCap": "330.4B",
+            "analysis": "Consolidating"
+        },
+        "previousHash": "000be0a9987ca5c30a02f3fbf5674a95b2c0cc85ec99cfc4d9adc1e85c00d766",
+        "nonce": 4596,
+        "hash": "0003e1c13daa1dcb2a19667c05f3bd712b647ef3d45160a1367c067a79cc7f0a"
+    },
+    {
+        "index": 4,
+        "timestamp": "10/02/2026, 03.55.22",
+        "data": {
+            "symbol": "SOLUSDT",
+            "price": "184.20",
+            "marketCap": "87.1B",
+            "analysis": "High Volume"
+        },
+        "previousHash": "0003e1c13daa1dcb2a19667c05f3bd712b647ef3d45160a1367c067a79cc7f0a",
+        "nonce": 2780,
+        "hash": "0006962763f7816598363b51e3cd382ff274cab9ee3e1c8e9f5237096041f068"
+    },
+    {
+        "index": 5,
+        "timestamp": "10/02/2026, 03.55.22",
+        "data": {
+            "symbol": "BNBUSDT",
+            "price": "592.15",
+            "marketCap": "85.8B",
+            "analysis": "Stable"
+        },
+        "previousHash": "0006962763f7816598363b51e3cd382ff274cab9ee3e1c8e9f5237096041f068",
+        "nonce": 2981,
+        "hash": "0007cfe6db0d274aba0b5d6662ff72239f3e248dce18210bed92def1cdb32fd1"
+    },
+    {
+        "index": 6,
+        "timestamp": "10/02/2026, 03.55.22",
+        "data": {
+            "symbol": "XRPUSDT",
+            "price": "2.45",
+            "marketCap": "139.7B",
+            "analysis": "Pump Expected"
+        },
+        "previousHash": "0007cfe6db0d274aba0b5d6662ff72239f3e248dce18210bed92def1cdb32fd1",
+        "nonce": 1846,
+        "hash": "000e44949f999f4e277ec259ee881b769f067ab65775750e57f06ef10e5900f5"
+    },
+    {
+        "index": 7,
+        "timestamp": "10/02/2026, 03.55.23",
+        "data": {
+            "symbol": "ADAUSDT",
+            "price": "0.72",
+            "marketCap": "25.6B",
+            "analysis": "Accumulating"
+        },
+        "previousHash": "000e44949f999f4e277ec259ee881b769f067ab65775750e57f06ef10e5900f5",
+        "nonce": 14174,
+        "hash": "0005c45118924d1405c60b66a270fe0425e2820867d98e0b909343df2c51087e"
+    },
+    {
+        "index": 8,
+        "timestamp": "10/02/2026, 03.55.23",
+        "data": {
+            "symbol": "AVAXUSDT",
+            "price": "34.10",
+            "marketCap": "14.2B",
+            "analysis": "Neutral"
+        },
+        "previousHash": "0005c45118924d1405c60b66a270fe0425e2820867d98e0b909343df2c51087e",
+        "nonce": 1219,
+        "hash": "000e799d2c29c0aaf6a6d28f4055c4402a7e4e30f04f3fb5d4ee7c5b74802006"
+    },
+    {
+        "index": 9,
+        "timestamp": "10/02/2026, 03.55.23",
+        "data": {
+            "symbol": "DOTUSDT",
+            "price": "6.85",
+            "marketCap": "9.8B",
+            "analysis": "Support Level"
+        },
+        "previousHash": "000e799d2c29c0aaf6a6d28f4055c4402a7e4e30f04f3fb5d4ee7c5b74802006",
+        "nonce": 317,
+        "hash": "000e76ca8e26fd39f553c427e46bcec9ab0fd671b9cc414a8f48465f475418ac"
+    },
+    {
+        "index": 10,
+        "timestamp": "10/02/2026, 03.55.23",
+        "data": {
+            "symbol": "LINKUSDT",
+            "price": "17.40",
+            "marketCap": "10.5B",
+            "analysis": "Oracle High Demand"
+        },
+        "previousHash": "000e76ca8e26fd39f553c427e46bcec9ab0fd671b9cc414a8f48465f475418ac",
+        "nonce": 3246,
+        "hash": "000203ef4aeada3119f6688316f59bead175ea5cb4f3351177d28e6df5710525"
+    },
+    {
+        "index": 11,
+        "timestamp": "10/02/2026, 03.55.23",
+        "data": {
+            "symbol": "PLUME",
+            "price": "1.25",
+            "marketCap": "250M",
+            "analysis": "New Listing Focus"
+        },
+        "previousHash": "000203ef4aeada3119f6688316f59bead175ea5cb4f3351177d28e6df5710525",
+        "nonce": 1789,
+        "hash": "000cb8ad6e94d9f511e76c5c5889c55e4a9eb0d8225eb108656cb6c0ccd47d01"
+    },
+    {
+        "index": 12,
+        "timestamp": "10/02/2026, 03.55.23",
+        "data": {
+            "symbol": "SUIUSDT",
+            "price": "3.10",
+            "marketCap": "8.9B",
+            "analysis": "L1 Growing"
+        },
+        "previousHash": "000cb8ad6e94d9f511e76c5c5889c55e4a9eb0d8225eb108656cb6c0ccd47d01",
+        "nonce": 490,
+        "hash": "000ec52c04579c707d3763a180d1b53c2f92c91e4528ebd8d71539b80bd47d8e"
+    },
+    {
+        "index": 13,
+        "timestamp": "10/02/2026, 03.55.23",
+        "data": {
+            "symbol": "NEARUSDT",
+            "price": "4.55",
+            "marketCap": "5.6B",
+            "analysis": "AI Narrative"
+        },
+        "previousHash": "000ec52c04579c707d3763a180d1b53c2f92c91e4528ebd8d71539b80bd47d8e",
+        "nonce": 556,
+        "hash": "000efa296f132caa872ae367437d67fda535122f28372fda4bc64647efe093d7"
+    },
+    {
+        "index": 14,
+        "timestamp": "10/02/2026, 03.57.20",
+        "data": {
+            "symbol": "BTCUSDT",
+            "price": "95,432.10",
+            "marketCap": "1.89T",
+            "analysis": "Bullish Strong"
+        },
+        "previousHash": "000efa296f132caa872ae367437d67fda535122f28372fda4bc64647efe093d7",
+        "nonce": 1664,
+        "hash": "0005ed316896a991e2c319e450d41e25c70a88d2efab0319b9b151998a8483b3"
+    },
+    {
+        "index": 15,
+        "timestamp": "10/02/2026, 03.57.21",
+        "data": {
+            "symbol": "ETHUSDT",
+            "price": "2,745.50",
+            "marketCap": "330.4B",
+            "analysis": "Consolidating"
+        },
+        "previousHash": "0005ed316896a991e2c319e450d41e25c70a88d2efab0319b9b151998a8483b3",
+        "nonce": 5292,
+        "hash": "000f7ed13b5ef43b33ec6856db9f307af82f04f3c984b993a93e3346d023a10f"
+    },
+    {
+        "index": 16,
+        "timestamp": "10/02/2026, 03.57.21",
+        "data": {
+            "symbol": "SOLUSDT",
+            "price": "184.20",
+            "marketCap": "87.1B",
+            "analysis": "High Volume"
+        },
+        "previousHash": "000f7ed13b5ef43b33ec6856db9f307af82f04f3c984b993a93e3346d023a10f",
+        "nonce": 765,
+        "hash": "000cfe7a1c232fd1c223c652cde71d0086946a97ebb623854e331ba39c0a73fc"
+    },
+    {
+        "index": 17,
+        "timestamp": "10/02/2026, 03.57.21",
+        "data": {
+            "symbol": "BNBUSDT",
+            "price": "592.15",
+            "marketCap": "85.8B",
+            "analysis": "Stable"
+        },
+        "previousHash": "000cfe7a1c232fd1c223c652cde71d0086946a97ebb623854e331ba39c0a73fc",
+        "nonce": 4610,
+        "hash": "0009207989f5960854b1b7c30a96702ba69faf463091dc0d4ab81357e06f7b82"
+    },
+    {
+        "index": 18,
+        "timestamp": "10/02/2026, 03.57.21",
+        "data": {
+            "symbol": "XRPUSDT",
+            "price": "2.45",
+            "marketCap": "139.7B",
+            "analysis": "Pump Expected"
+        },
+        "previousHash": "0009207989f5960854b1b7c30a96702ba69faf463091dc0d4ab81357e06f7b82",
+        "nonce": 80,
+        "hash": "000dc6bb8dbab31d38fe41ed0b1b6b981a6463104a38d4de92038a8005ef5693"
+    },
+    {
+        "index": 19,
+        "timestamp": "10/02/2026, 03.57.21",
+        "data": {
+            "symbol": "ADAUSDT",
+            "price": "0.72",
+            "marketCap": "25.6B",
+            "analysis": "Accumulating"
+        },
+        "previousHash": "000dc6bb8dbab31d38fe41ed0b1b6b981a6463104a38d4de92038a8005ef5693",
+        "nonce": 9938,
+        "hash": "0002bfb7ee70e5c9f2533f099c18a15722cdbaf8aa7da9e8d655fc710f6067ba"
+    },
+    {
+        "index": 20,
+        "timestamp": "10/02/2026, 03.57.22",
+        "data": {
+            "symbol": "AVAXUSDT",
+            "price": "34.10",
+            "marketCap": "14.2B",
+            "analysis": "Neutral"
+        },
+        "previousHash": "0002bfb7ee70e5c9f2533f099c18a15722cdbaf8aa7da9e8d655fc710f6067ba",
+        "nonce": 4949,
+        "hash": "00091f9f5d15ed418e6a7e2722e446c24fb027f54123ca4e32cf9a446eebd6af"
+    },
+    {
+        "index": 21,
+        "timestamp": "10/02/2026, 03.57.22",
+        "data": {
+            "symbol": "DOTUSDT",
+            "price": "6.85",
+            "marketCap": "9.8B",
+            "analysis": "Support Level"
+        },
+        "previousHash": "00091f9f5d15ed418e6a7e2722e446c24fb027f54123ca4e32cf9a446eebd6af",
+        "nonce": 5263,
+        "hash": "000a7922394c7aeb82f5dae067e60430ea0e4386d637a53d7303d20182316a16"
+    },
+    {
+        "index": 22,
+        "timestamp": "10/02/2026, 03.57.22",
+        "data": {
+            "symbol": "LINKUSDT",
+            "price": "17.40",
+            "marketCap": "10.5B",
+            "analysis": "Oracle High Demand"
+        },
+        "previousHash": "000a7922394c7aeb82f5dae067e60430ea0e4386d637a53d7303d20182316a16",
+        "nonce": 17012,
+        "hash": "000695858228e8edc71d708895124dec6270d6a46b460747c7657bff26368403"
+    },
+    {
+        "index": 23,
+        "timestamp": "10/02/2026, 03.57.22",
+        "data": {
+            "symbol": "PLUME",
+            "price": "1.25",
+            "marketCap": "250M",
+            "analysis": "New Listing Focus"
+        },
+        "previousHash": "000695858228e8edc71d708895124dec6270d6a46b460747c7657bff26368403",
+        "nonce": 210,
+        "hash": "000fdbeac05bc471d8cc24a99803a1dcca92d40c9a96469e82902db24e4110da"
+    },
+    {
+        "index": 24,
+        "timestamp": "10/02/2026, 03.57.22",
+        "data": {
+            "symbol": "SUIUSDT",
+            "price": "3.10",
+            "marketCap": "8.9B",
+            "analysis": "L1 Growing"
+        },
+        "previousHash": "000fdbeac05bc471d8cc24a99803a1dcca92d40c9a96469e82902db24e4110da",
+        "nonce": 5349,
+        "hash": "0009b2848e2e119ada01355720adb23f2a32ebdb70c2cc98f750a7249cd1a3e2"
+    },
+    {
+        "index": 25,
+        "timestamp": "10/02/2026, 03.57.23",
+        "data": {
+            "symbol": "NEARUSDT",
+            "price": "4.55",
+            "marketCap": "5.6B",
+            "analysis": "AI Narrative"
+        },
+        "previousHash": "0009b2848e2e119ada01355720adb23f2a32ebdb70c2cc98f750a7249cd1a3e2",
+        "nonce": 10174,
+        "hash": "000066618d9d7b774bf641059c8df312c596848ba11e22a17f2fac56779ffd3a"
+    },
+    {
+        "index": 26,
+        "timestamp": "10/02/2026, 04.20.55",
+        "data": {
+            "symbol": "BTCUSDT",
+            "price": "95,432.10",
+            "marketCap": "1.89T",
+            "analysis": "Bullish Strong"
+        },
+        "previousHash": "000066618d9d7b774bf641059c8df312c596848ba11e22a17f2fac56779ffd3a",
+        "nonce": 314,
+        "hash": "000c7fdd9f959926849d518f6401eb63b288832acbed47930a3982e4aab71c90"
+    },
+    {
+        "index": 27,
+        "timestamp": "10/02/2026, 04.20.55",
+        "data": {
+            "symbol": "ETHUSDT",
+            "price": "2,745.50",
+            "marketCap": "330.4B",
+            "analysis": "Consolidating"
+        },
+        "previousHash": "000c7fdd9f959926849d518f6401eb63b288832acbed47930a3982e4aab71c90",
+        "nonce": 3160,
+        "hash": "0006bd6a29fa90b96bc44dcff20059f14b27b0d22d78ca930d056981dff09511"
+    },
+    {
+        "index": 28,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "SOLUSDT",
+            "price": "184.20",
+            "marketCap": "87.1B",
+            "analysis": "High Volume"
+        },
+        "previousHash": "0006bd6a29fa90b96bc44dcff20059f14b27b0d22d78ca930d056981dff09511",
+        "nonce": 4601,
+        "hash": "0008f30796bd36e6d577479e2c202de3de485765559a6a87df471f705510dc7a"
+    },
+    {
+        "index": 29,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "BNBUSDT",
+            "price": "592.15",
+            "marketCap": "85.8B",
+            "analysis": "Stable"
+        },
+        "previousHash": "0008f30796bd36e6d577479e2c202de3de485765559a6a87df471f705510dc7a",
+        "nonce": 1552,
+        "hash": "000b556c7cf8e6897985cd5390b2d5b0973d79a1af6a288f160e5012993bb65b"
+    },
+    {
+        "index": 30,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "XRPUSDT",
+            "price": "2.45",
+            "marketCap": "139.7B",
+            "analysis": "Pump Expected"
+        },
+        "previousHash": "000b556c7cf8e6897985cd5390b2d5b0973d79a1af6a288f160e5012993bb65b",
+        "nonce": 3316,
+        "hash": "000a6b3d2fd7066a4cf319ec5dee8f46d422a738e99c909c978e81d1f994d376"
+    },
+    {
+        "index": 31,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "ADAUSDT",
+            "price": "0.72",
+            "marketCap": "25.6B",
+            "analysis": "Accumulating"
+        },
+        "previousHash": "000a6b3d2fd7066a4cf319ec5dee8f46d422a738e99c909c978e81d1f994d376",
+        "nonce": 1626,
+        "hash": "000f29fccd1c4ebbf8f3e50ceea403fdf5ab0534504f3f949990a2a64aa7cc3e"
+    },
+    {
+        "index": 32,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "AVAXUSDT",
+            "price": "34.10",
+            "marketCap": "14.2B",
+            "analysis": "Neutral"
+        },
+        "previousHash": "000f29fccd1c4ebbf8f3e50ceea403fdf5ab0534504f3f949990a2a64aa7cc3e",
+        "nonce": 165,
+        "hash": "00019ef9673ccbff7c196cd72b3bc2b49bada9d1ea521187cdc9865fdc120e86"
+    },
+    {
+        "index": 33,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "DOTUSDT",
+            "price": "6.85",
+            "marketCap": "9.8B",
+            "analysis": "Support Level"
+        },
+        "previousHash": "00019ef9673ccbff7c196cd72b3bc2b49bada9d1ea521187cdc9865fdc120e86",
+        "nonce": 79,
+        "hash": "000422fea0af53591ffccd04f63d2b67ce140de21587dc0656f16d0207ebbdde"
+    },
+    {
+        "index": 34,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "LINKUSDT",
+            "price": "17.40",
+            "marketCap": "10.5B",
+            "analysis": "Oracle High Demand"
+        },
+        "previousHash": "000422fea0af53591ffccd04f63d2b67ce140de21587dc0656f16d0207ebbdde",
+        "nonce": 10071,
+        "hash": "000ee986a749d75e6beb3fbbf5a0e8b4295b14449c67221df25b67439d78e59a"
+    },
+    {
+        "index": 35,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "PLUME",
+            "price": "1.25",
+            "marketCap": "250M",
+            "analysis": "New Listing Focus"
+        },
+        "previousHash": "000ee986a749d75e6beb3fbbf5a0e8b4295b14449c67221df25b67439d78e59a",
+        "nonce": 3324,
+        "hash": "000a5b7644b3a8101c5eede6f4fbd1bce37c588361e4350aa707cb2db58ad43c"
+    },
+    {
+        "index": 36,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "SUIUSDT",
+            "price": "3.10",
+            "marketCap": "8.9B",
+            "analysis": "L1 Growing"
+        },
+        "previousHash": "000a5b7644b3a8101c5eede6f4fbd1bce37c588361e4350aa707cb2db58ad43c",
+        "nonce": 2225,
+        "hash": "00068f4bac54774dfd05446a9cbd392abdb06a3ca396eb473a4d7644e6122696"
+    },
+    {
+        "index": 37,
+        "timestamp": "10/02/2026, 04.20.56",
+        "data": {
+            "symbol": "NEARUSDT",
+            "price": "4.55",
+            "marketCap": "5.6B",
+            "analysis": "AI Narrative"
+        },
+        "previousHash": "00068f4bac54774dfd05446a9cbd392abdb06a3ca396eb473a4d7644e6122696",
+        "nonce": 3069,
+        "hash": "00099ad31df5d6d78d6313998ec9fcb1309c56b6bf56e43c7c9f6a31db56ac85"
+    },
+    {
+        "index": 38,
+        "timestamp": "10/02/2026, 04.24.01",
+        "data": {
+            "symbol": "BTCUSDT",
+            "price": "95,432.10",
+            "marketCap": "1.89T",
+            "analysis": "Bullish Strong"
+        },
+        "previousHash": "00099ad31df5d6d78d6313998ec9fcb1309c56b6bf56e43c7c9f6a31db56ac85",
+        "nonce": 1587,
+        "hash": "000e7f3b2d6afb1b85a17276ea5a284ba3efdd78f0d085922bb0aac0b2d17905"
+    },
+    {
+        "index": 39,
+        "timestamp": "10/02/2026, 04.24.01",
+        "data": {
+            "symbol": "ETHUSDT",
+            "price": "2,745.50",
+            "marketCap": "330.4B",
+            "analysis": "Consolidating"
+        },
+        "previousHash": "000e7f3b2d6afb1b85a17276ea5a284ba3efdd78f0d085922bb0aac0b2d17905",
+        "nonce": 569,
+        "hash": "0000e9a6671d422860ede2c7dbbdf25bfddd15d674118c38a6e0bc5e5d722464"
+    },
+    {
+        "index": 40,
+        "timestamp": "10/02/2026, 04.24.01",
+        "data": {
+            "symbol": "SOLUSDT",
+            "price": "184.20",
+            "marketCap": "87.1B",
+            "analysis": "High Volume"
+        },
+        "previousHash": "0000e9a6671d422860ede2c7dbbdf25bfddd15d674118c38a6e0bc5e5d722464",
+        "nonce": 3745,
+        "hash": "0002227edc56eabea8fa3d717c9505f946deb4960d2bd26e7507ab4d91951df8"
+    },
+    {
+        "index": 41,
+        "timestamp": "10/02/2026, 04.24.02",
+        "data": {
+            "symbol": "BNBUSDT",
+            "price": "592.15",
+            "marketCap": "85.8B",
+            "analysis": "Stable"
+        },
+        "previousHash": "0002227edc56eabea8fa3d717c9505f946deb4960d2bd26e7507ab4d91951df8",
+        "nonce": 8045,
+        "hash": "000e82c0dc7f2cdc332d77c16f2f908878e6d62194dfa71ac3ad1f51cb861839"
+    },
+    {
+        "index": 42,
+        "timestamp": "10/02/2026, 04.24.02",
+        "data": {
+            "symbol": "XRPUSDT",
+            "price": "2.45",
+            "marketCap": "139.7B",
+            "analysis": "Pump Expected"
+        },
+        "previousHash": "000e82c0dc7f2cdc332d77c16f2f908878e6d62194dfa71ac3ad1f51cb861839",
+        "nonce": 6614,
+        "hash": "0007ba2ef7f7a9bffb79abc155f124707ce5e46ad32b4c94218c6a97f7c6ebb2"
+    },
+    {
+        "index": 43,
+        "timestamp": "10/02/2026, 04.24.02",
+        "data": {
+            "symbol": "ADAUSDT",
+            "price": "0.72",
+            "marketCap": "25.6B",
+            "analysis": "Accumulating"
+        },
+        "previousHash": "0007ba2ef7f7a9bffb79abc155f124707ce5e46ad32b4c94218c6a97f7c6ebb2",
+        "nonce": 20198,
+        "hash": "0003d5bf7b8f325cf3b8683b3871ba34ce7f4c3a04f01c1952e7379e11e970b2"
+    },
+    {
+        "index": 44,
+        "timestamp": "10/02/2026, 04.24.03",
+        "data": {
+            "symbol": "AVAXUSDT",
+            "price": "34.10",
+            "marketCap": "14.2B",
+            "analysis": "Neutral"
+        },
+        "previousHash": "0003d5bf7b8f325cf3b8683b3871ba34ce7f4c3a04f01c1952e7379e11e970b2",
+        "nonce": 15034,
+        "hash": "00038c59b75a39b347e5862e682292d1ca451076080f17bec5474ef00d12fd31"
+    },
+    {
+        "index": 45,
+        "timestamp": "10/02/2026, 04.24.03",
+        "data": {
+            "symbol": "DOTUSDT",
+            "price": "6.85",
+            "marketCap": "9.8B",
+            "analysis": "Support Level"
+        },
+        "previousHash": "00038c59b75a39b347e5862e682292d1ca451076080f17bec5474ef00d12fd31",
+        "nonce": 1473,
+        "hash": "00062d52fc090953bacf754bee8ba70cc244e8b11f4e6d8213dfc87e9277264e"
+    },
+    {
+        "index": 46,
+        "timestamp": "10/02/2026, 04.24.03",
+        "data": {
+            "symbol": "LINKUSDT",
+            "price": "17.40",
+            "marketCap": "10.5B",
+            "analysis": "Oracle High Demand"
+        },
+        "previousHash": "00062d52fc090953bacf754bee8ba70cc244e8b11f4e6d8213dfc87e9277264e",
+        "nonce": 1100,
+        "hash": "000613e25ee073b066e818a0d1eb5c7b91d2cf58bbc03379373d8bab3059651b"
+    },
+    {
+        "index": 47,
+        "timestamp": "10/02/2026, 04.24.03",
+        "data": {
+            "symbol": "PLUME",
+            "price": "1.25",
+            "marketCap": "250M",
+            "analysis": "New Listing Focus"
+        },
+        "previousHash": "000613e25ee073b066e818a0d1eb5c7b91d2cf58bbc03379373d8bab3059651b",
+        "nonce": 2364,
+        "hash": "000332d521cf9774fd52899e21773f9c96e722b78cdf4f87c043d08653491c7e"
+    },
+    {
+        "index": 48,
+        "timestamp": "10/02/2026, 04.24.03",
+        "data": {
+            "symbol": "SUIUSDT",
+            "price": "3.10",
+            "marketCap": "8.9B",
+            "analysis": "L1 Growing"
+        },
+        "previousHash": "000332d521cf9774fd52899e21773f9c96e722b78cdf4f87c043d08653491c7e",
+        "nonce": 2018,
+        "hash": "0008defbc57eea2e8bc04bcf6775401f75562c35ba5b733409ee81fa1291166c"
+    },
+    {
+        "index": 49,
+        "timestamp": "10/02/2026, 04.24.04",
+        "data": {
+            "symbol": "NEARUSDT",
+            "price": "4.55",
+            "marketCap": "5.6B",
+            "analysis": "AI Narrative"
+        },
+        "previousHash": "0008defbc57eea2e8bc04bcf6775401f75562c35ba5b733409ee81fa1291166c",
+        "nonce": 2324,
+        "hash": "000992710782c82a2afc7c5803b206f134a476148b87c892705454c6e7679e00"
+    },
+    {
+        "index": 50,
+        "timestamp": "10/02/2026, 05.01.06",
+        "data": {
+            "symbol": "BTCUSDT",
+            "price": "95,432.10",
+            "marketCap": "1.89T",
+            "analysis": "Bullish Strong"
+        },
+        "previousHash": "000992710782c82a2afc7c5803b206f134a476148b87c892705454c6e7679e00",
+        "nonce": 3923,
+        "hash": "000dce55faf7e527cbd57f06ee939cde8010c262be50b4a5b53e5cee65279c6e"
+    },
+    {
+        "index": 51,
+        "timestamp": "10/02/2026, 05.01.06",
+        "data": {
+            "symbol": "ETHUSDT",
+            "price": "2,745.50",
+            "marketCap": "330.4B",
+            "analysis": "Consolidating"
+        },
+        "previousHash": "000dce55faf7e527cbd57f06ee939cde8010c262be50b4a5b53e5cee65279c6e",
+        "nonce": 5383,
+        "hash": "0001417f1d8c900b524f82c8f65b6fb19fed305e4f1c80e77e53681547b4e6b8"
+    },
+    {
+        "index": 52,
+        "timestamp": "10/02/2026, 05.01.06",
+        "data": {
+            "symbol": "SOLUSDT",
+            "price": "184.20",
+            "marketCap": "87.1B",
+            "analysis": "High Volume"
+        },
+        "previousHash": "0001417f1d8c900b524f82c8f65b6fb19fed305e4f1c80e77e53681547b4e6b8",
+        "nonce": 609,
+        "hash": "000189d2c56528b69459ca2a6acf43a2f7bcf3fa2a7f43df7663c8e8de2e97d9"
+    },
+    {
+        "index": 53,
+        "timestamp": "10/02/2026, 05.01.06",
+        "data": {
+            "symbol": "BNBUSDT",
+            "price": "592.15",
+            "marketCap": "85.8B",
+            "analysis": "Stable"
+        },
+        "previousHash": "000189d2c56528b69459ca2a6acf43a2f7bcf3fa2a7f43df7663c8e8de2e97d9",
+        "nonce": 2780,
+        "hash": "000cbe66e63c4a762f96b1e48d128ef5a9f4dd6b74d3fcb487351a655b312d6d"
+    },
+    {
+        "index": 54,
+        "timestamp": "10/02/2026, 05.01.07",
+        "data": {
+            "symbol": "XRPUSDT",
+            "price": "2.45",
+            "marketCap": "139.7B",
+            "analysis": "Pump Expected"
+        },
+        "previousHash": "000cbe66e63c4a762f96b1e48d128ef5a9f4dd6b74d3fcb487351a655b312d6d",
+        "nonce": 6292,
+        "hash": "000edda08d6f7eff0f457554a8385354a8a072a8ca20b1f38ad532d5dee118ef"
+    },
+    {
+        "index": 55,
+        "timestamp": "10/02/2026, 05.01.07",
+        "data": {
+            "symbol": "ADAUSDT",
+            "price": "0.72",
+            "marketCap": "25.6B",
+            "analysis": "Accumulating"
+        },
+        "previousHash": "000edda08d6f7eff0f457554a8385354a8a072a8ca20b1f38ad532d5dee118ef",
+        "nonce": 4361,
+        "hash": "000a66aefca83f3618bbd488bd0de8fa6fe032d1d5f40ac775b5e117e113d43f"
+    },
+    {
+        "index": 56,
+        "timestamp": "10/02/2026, 05.01.07",
+        "data": {
+            "symbol": "AVAXUSDT",
+            "price": "34.10",
+            "marketCap": "14.2B",
+            "analysis": "Neutral"
+        },
+        "previousHash": "000a66aefca83f3618bbd488bd0de8fa6fe032d1d5f40ac775b5e117e113d43f",
+        "nonce": 10647,
+        "hash": "000a19acbb58e9499525c23fb18b8272b16100f1746ed120417ea89c96e6eb90"
+    },
+    {
+        "index": 57,
+        "timestamp": "10/02/2026, 05.01.08",
+        "data": {
+            "symbol": "DOTUSDT",
+            "price": "6.85",
+            "marketCap": "9.8B",
+            "analysis": "Support Level"
+        },
+        "previousHash": "000a19acbb58e9499525c23fb18b8272b16100f1746ed120417ea89c96e6eb90",
+        "nonce": 2751,
+        "hash": "0004175f089bc6f0c6237772afa322eeeba1edb70245a62237b00e82e14b74c2"
+    },
+    {
+        "index": 58,
+        "timestamp": "10/02/2026, 05.01.08",
+        "data": {
+            "symbol": "LINKUSDT",
+            "price": "17.40",
+            "marketCap": "10.5B",
+            "analysis": "Oracle High Demand"
+        },
+        "previousHash": "0004175f089bc6f0c6237772afa322eeeba1edb70245a62237b00e82e14b74c2",
+        "nonce": 1366,
+        "hash": "000e9eb315c8d8a2bcfa31164f088358e4663975bc17892320a11f2624b678e1"
+    },
+    {
+        "index": 59,
+        "timestamp": "10/02/2026, 05.01.08",
+        "data": {
+            "symbol": "PLUME",
+            "price": "1.25",
+            "marketCap": "250M",
+            "analysis": "New Listing Focus"
+        },
+        "previousHash": "000e9eb315c8d8a2bcfa31164f088358e4663975bc17892320a11f2624b678e1",
+        "nonce": 3694,
+        "hash": "000494bf5fd1c791b0c5aacdbe141e08fbb99c37128bdfc9e8d6f63d74634db0"
+    },
+    {
+        "index": 60,
+        "timestamp": "10/02/2026, 05.01.08",
+        "data": {
+            "symbol": "SUIUSDT",
+            "price": "3.10",
+            "marketCap": "8.9B",
+            "analysis": "L1 Growing"
+        },
+        "previousHash": "000494bf5fd1c791b0c5aacdbe141e08fbb99c37128bdfc9e8d6f63d74634db0",
+        "nonce": 9565,
+        "hash": "000cbb0711249715d06ea29545d9f9a2a2109bd8c5a0ecc54240954b8ced04ff"
+    },
+    {
+        "index": 61,
+        "timestamp": "10/02/2026, 05.01.09",
+        "data": {
+            "symbol": "NEARUSDT",
+            "price": "4.55",
+            "marketCap": "5.6B",
+            "analysis": "AI Narrative"
+        },
+        "previousHash": "000cbb0711249715d06ea29545d9f9a2a2109bd8c5a0ecc54240954b8ced04ff",
+        "nonce": 1368,
+        "hash": "0008bfe7643e504cfb0b2c7d71a0bc8f8187fc7674cf5069bcb586e1620a0bdb"
+    },
+    {
+        "index": 62,
+        "timestamp": "10/02/2026, 06.02.19",
+        "data": {
+            "symbol": "DafzikCoin",
+            "price": "999",
+            "note": "Tes Port 5000 Berhasil!"
+        },
+        "previousHash": "0008bfe7643e504cfb0b2c7d71a0bc8f8187fc7674cf5069bcb586e1620a0bdb",
+        "nonce": 365,
+        "hash": "000e6ffd86b0f54b313e843c2e82e827d975afdb61bc59e97210835f27e7c4f4"
+    },
+    {
+        "index": 63,
+        "timestamp": "10/02/2026, 06.07.20",
+        "data": {
+            "symbol": "DAFZIK_MOON",
+            "price": "1000000",
+            "note": "Ini blok pertama lewat API!"
+        },
+        "previousHash": "000e6ffd86b0f54b313e843c2e82e827d975afdb61bc59e97210835f27e7c4f4",
+        "nonce": 669,
+        "hash": "00064ffc185bc1dad95c66adb746c0f8a798cba8bb8091352b62e3b34204d354"
+    }
+]

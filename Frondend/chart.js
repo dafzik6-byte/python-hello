@@ -135,13 +135,13 @@ async function updateMarketSeason() {
         else { textEl.innerText = "NEUTRAL MOMENTUM"; textEl.style.color = "#fff"; }
     } catch (e) {}
 }
-
 async function fetchFund(s) {
     try {
         const ticker = s.replace('USDT', '');
         const id = coinMap[ticker] || ticker.toLowerCase();
         const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true`);
         const d = await res.json();
+        
         if(d.market_data) {
             circSupply = d.market_data.circulating_supply;
             currentTotalSupply = d.market_data.max_supply || d.market_data.total_supply || circSupply;
@@ -151,6 +151,12 @@ async function fetchFund(s) {
             
             if(lastP > 0) {
                 const mktCap = lastP * circSupply;
+                const currentFDV = lastP * currentTotalSupply;
+
+                // --- POSISI TERBAIK: Kirim ke Blockchain setelah data dihitung ---
+                syncToBlockchain(s, mktCap, currentFDV);
+                // ---------------------------------------------------------------
+
                 document.getElementById('live-mkt-cap').innerText = `$${Math.round(mktCap).toLocaleString()}`;
                 
                 // Realized Cap Logic
@@ -160,6 +166,7 @@ async function fetchFund(s) {
             }
         }
     } catch(e) { 
+        console.error("Fetch Error:", e);
         document.getElementById('disp-circ').innerText = "Data N/A"; 
         document.getElementById('disp-max').innerText = "N/A";
     }
@@ -220,6 +227,24 @@ async function startLive(symbol) {
         if (f.childNodes.length > 40) f.lastChild.remove();
         lastP = p;
     };
+}
+
+async function saveToBlockchain(coinData) {
+    try {
+        const response = await fetch('http://localhost:3000/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(coinData), // Data FDV, TVL, dll
+        });
+        
+        const result = await response.json();
+        console.log("Blockchain Response:", result.message);
+        alert("Data Koin Terkunci di Blockchain! Hash: " + result.hash);
+    } catch (error) {
+        console.error("Gagal mengirim ke Blockchain:", error);
+    }
 }
 
 async function refreshFearGreedGauge() {
@@ -327,3 +352,23 @@ updateMarketSeason();
 renderWatchlist();
 setInterval(refreshFearGreedGauge, 300000); 
 setInterval(updateMarketSeason, 60000);
+
+// Fungsi untuk mengirim data ke Blockchain Backend kita
+async function syncToBlockchain(coinName, mktCap, fdv) {
+    try {
+        const response = await fetch('http://localhost:3000/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                symbol: coinName,
+                marketCap: mktCap,
+                fdv: fdv,
+                timestamp: new Date().toISOString()
+            })
+        });
+        const result = await response.json();
+        console.log("✅ Blockchain Sync:", result.hash);
+    } catch (err) {
+        console.warn("❌ Blockchain Offline. Pastikan 'node server.js' menyala.");
+    }
+}
